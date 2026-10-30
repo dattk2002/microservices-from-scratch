@@ -1,0 +1,146 @@
+[
+  {
+    "id": "01-service-boundaries-http",
+    "title": "Ranh giới dịch vụ và HTTP",
+    "requirements": [
+      "Two independent Catalog/Orders processes communicate through HTTP; Orders owns snapshots and integer-cent totals.",
+      "Validate input and bounded payloads, distinguish dependency outage/timeout, use real HTTP integration tests."
+    ],
+    "references": [
+      "https://nodejs.org/docs/latest-v24.x/api/http.html"
+    ]
+  },
+  {
+    "id": "02-api-contracts",
+    "title": "Hợp đồng API và tương thích phiên bản",
+    "requirements": [
+      "Build an independently runnable Catalog/Orders lesson with GET /v1/products/:id and a different nested-price /v2/products/:id schema; Orders continues consuming v1.",
+      "A pure runtime v1-product parser accepts additive unknown response fields but rejects missing/wrong-type/id/price fields; write meaningful unit fixtures first.",
+      "Prove compatibility with additive provider fields and rejection of incompatible upstream data over real HTTP with separate provider/consumer processes. Explain that TypeScript alone does not validate network JSON."
+    ],
+    "references": [
+      "https://www.typescriptlang.org/docs/handbook/2/narrowing.html",
+      "https://nodejs.org/docs/latest-v24.x/api/http.html"
+    ]
+  },
+  {
+    "id": "03-service-owned-persistence",
+    "title": "Dữ liệu thuộc từng dịch vụ",
+    "requirements": [
+      "Use built-in node:sqlite for separate service-owned SQLite files under configurable temporary/data paths; never share a database file between services.",
+      "Demonstrate an order surviving Orders restart and retrieval without the Catalog dependency; use real processes and independent temp database paths per test.",
+      "Document schema/migration initialization, ownership boundaries and SQLite single-node tradeoffs, without claiming a production deployment."
+    ],
+    "references": [
+      "https://nodejs.org/docs/latest-v24.x/api/sqlite.html"
+    ]
+  },
+  {
+    "id": "04-deadline-propagation",
+    "title": "Truyền deadline và hủy yêu cầu",
+    "requirements": [
+      "Go beyond lesson01 single-hop timeout: propagate a bounded end-to-end remaining deadline through Gateway→Orders→Catalog.",
+      "Use AbortController and validated deadline metadata; cancel downstream work when the caller disconnects or the budget expires.",
+      "Unit-test budget calculations with an injected clock; use real service processes and synchronization/barriers to verify cancellation without brittle sleep-based assertions."
+    ],
+    "references": [
+      "https://nodejs.org/docs/latest-v24.x/api/globals.html#class-abortsignal"
+    ]
+  },
+  {
+    "id": "05-idempotent-orders",
+    "title": "Tạo đơn có idempotency",
+    "requirements": [
+      "Implement an Idempotency-Key contract for order creation with persistent service-owned SQLite records and a request fingerprint.",
+      "Concurrent identical requests return the same order; a reused key with different input returns409; a completed response can be replayed after restart.",
+      "Test real concurrent HTTP requests, conflict cases, input validation and restart recovery; explain failures still requiring recovery rather than asserting exactly-once networking."
+    ],
+    "references": [
+      "https://www.rfc-editor.org/rfc/rfc9110.html#name-idempotent-methods"
+    ]
+  },
+  {
+    "id": "06-safe-retries",
+    "title": "Retry có giới hạn và backoff",
+    "requirements": [
+      "Implement bounded retry policy with exponential backoff and jitter for transient safe/idempotent operations only, respecting the overall deadline.",
+      "Pure policy tests use deterministic RNG/clock; real HTTP tests make an upstream fail twice then succeed and prove exact bounded attempts.",
+      "Do not retry arbitrary POST requests blindly; compare safe GET and a request protected by an idempotency contract."
+    ],
+    "references": [
+      "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+    ]
+  },
+  {
+    "id": "07-circuit-breaker",
+    "title": "Circuit breaker và half-open",
+    "requirements": [
+      "Build an explicit closed/open/half-open state machine around a downstream HTTP dependency; bound the half-open probe count.",
+      "Unit-test state/time transitions with an injected clock; integration-test fast failures while open and recovery after a successful probe.",
+      "Explain circuit breaker versus timeout/retry and document the scope/limits of per-instance state."
+    ],
+    "references": [
+      "https://martinfowler.com/bliki/CircuitBreaker.html"
+    ]
+  },
+  {
+    "id": "08-correlation-logging",
+    "title": "Correlation ID và log có cấu trúc",
+    "requirements": [
+      "Propagate a validated correlation/request ID between independent HTTP services, using generated IDs for absent/invalid input.",
+      "Emit structured JSON logs without request secrets and demonstrate tracing one request across services.",
+      "Test interleaved requests for context isolation and actual propagated HTTP headers/log records; explain logs are not a full distributed tracing system."
+    ],
+    "references": [
+      "https://nodejs.org/docs/latest-v24.x/api/async_context.html"
+    ]
+  },
+  {
+    "id": "09-gateway-aggregation",
+    "title": "API gateway và kết quả một phần",
+    "requirements": [
+      "Build a gateway that concurrently aggregates two independently owned downstream resources through HTTP, without database sharing.",
+      "Set bounded per-dependency/overall deadlines and specify an explicit partial-result contract versus total failure.",
+      "Test healthy, single-dependency failure, total failure and input validation with real separate processes; avoid a gateway that reimplements all business logic."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/microservices/design/gateway"
+    ]
+  },
+  {
+    "id": "10-graceful-shutdown",
+    "title": "Readiness và graceful shutdown",
+    "requirements": [
+      "Extend beyond basic listener close: implement a draining state that rejects new business requests, reports readiness false, and lets in-flight work finish before a bounded exit.",
+      "Use a local lifecycle implementation if root shared helper semantics do not fit; do not modify root helpers.",
+      "Unit-test lifecycle transitions and integration-test SIGTERM with synchronized in-flight requests and eventual process exit; distinguish liveness and readiness."
+    ],
+    "references": [
+      "https://nodejs.org/docs/latest-v24.x/api/http.html#serverclosecallback"
+    ]
+  },
+  {
+    "id": "11-transactional-outbox",
+    "title": "Transactional outbox và giao nhận ít nhất một lần",
+    "requirements": [
+      "Use a service-owned SQLite transaction to atomically store a business change and an outbox event.",
+      "Deliver events to another service over an explicitly documented HTTP transport with retries and an idempotent consumer; do not claim to implement Kafka or exactly-once delivery.",
+      "Test receiver outage, duplicate delivery and producer restart recovery with separate service processes and durable temp files."
+    ],
+    "references": [
+      "https://microservices.io/patterns/data/transactional-outbox.html"
+    ]
+  },
+  {
+    "id": "12-saga-compensation",
+    "title": "Saga và hành động bù trừ",
+    "requirements": [
+      "Build a small durable orchestrated saga coordinating simulated Inventory and Payment services over HTTP, without any real payment/network integration.",
+      "Document forward and compensating operations, idempotency and explicit recovery from failed compensation.",
+      "Test success, payment refusal, compensation and restart recovery using independent processes; do not call local compensation a distributed ACID transaction."
+    ],
+    "references": [
+      "https://microservices.io/patterns/data/saga.html"
+    ]
+  }
+]

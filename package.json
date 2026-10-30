@@ -1,0 +1,17 @@
+{
+  "name": "microservices-from-scratch",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=24.12.0 <25"},
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --test-timeout=15000 lessons/*/test/*.test.mts",
+    "test:unit": "node --test --test-name-pattern=unit: lessons/*/test/*.test.mts",
+    "check": "npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "5.9.3"
+  }
+}

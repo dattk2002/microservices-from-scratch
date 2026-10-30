@@ -1,0 +1,4 @@
+{
+  "id": "01-service-boundaries-http",
+  "entrypoints": ["catalog.mts", "orders.mts"]
+}
