@@ -1,0 +1,6 @@
+.git
+node_modules
+.superpowers
+.env
+*.sqlite*
+__pycache__
