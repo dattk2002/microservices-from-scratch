@@ -1,0 +1,4 @@
+{
+  "id": "02-api-contracts",
+  "entrypoints": ["catalog.mts", "orders.mts"]
+}
