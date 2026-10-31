@@ -1,0 +1,4 @@
+{
+  "id": "05-idempotent-orders",
+  "entrypoints": ["catalog.mts", "orders.mts"]
+}
