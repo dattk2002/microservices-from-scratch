@@ -1,0 +1,4 @@
+{
+  "id": "03-service-owned-persistence",
+  "entrypoints": ["catalog.mts", "orders.mts"]
+}
