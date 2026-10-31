@@ -3,7 +3,7 @@ import test from 'node:test';
 import { spawn } from 'node:child_process';
 import { deadline, remaining } from '../budget.mts';
 
-test('unit: importing all service entrypoints exits naturally without starting listeners', async () => {
+test('integration: importing all service entrypoints exits naturally without starting listeners', async () => {
   const entries = ['gateway.mts', 'orders.mts', 'catalog.mts'].map(name => new URL(`../${name}`, import.meta.url).href);
   const script = `${entries.map(entry => `await import(${JSON.stringify(entry)});`).join('\n')}\nconsole.log('imports-complete');`;
   const child = spawn(process.execPath, ['--input-type=module', '--eval', script], {
