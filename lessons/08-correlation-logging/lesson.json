@@ -1,0 +1,4 @@
+{
+  "id": "08-correlation-logging",
+  "entrypoints": ["catalog.mts", "gateway.mts"]
+}
