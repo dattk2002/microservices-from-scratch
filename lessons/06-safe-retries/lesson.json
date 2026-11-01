@@ -1,0 +1,4 @@
+{
+  "id": "06-safe-retries",
+  "entrypoints": ["upstream.mts", "client.mts"]
+}
