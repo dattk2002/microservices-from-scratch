@@ -1,0 +1,4 @@
+{
+  "id": "09-gateway-aggregation",
+  "entrypoints": ["catalog.mts", "stock.mts", "gateway.mts"]
+}
