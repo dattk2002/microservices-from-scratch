@@ -1,0 +1,4 @@
+{
+  "id": "07-circuit-breaker",
+  "entrypoints": ["upstream.mts", "client.mts"]
+}
