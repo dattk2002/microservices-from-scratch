@@ -2,7 +2,8 @@
 
 Chủ repo đã cho phép lịch09:15 Asia/Ho_Chi_Minh làm một bài tiếp theo trong
 `curriculum.json`, có PR và squash merge sau test/review/CI đạt. Lộ trình hữu
-hạn12 bài; không tự gia hạn, không tạo bài để đủ quota. Không sửa repo thuật toán
+hạn15 bài (chủ repo duyệt bổ sung bài13–15 ngày2026-11-02); không tự gia hạn,
+không tạo bài để đủ quota. Không sửa repo thuật toán
 hoặc cron09:00. Máy tắt vào giờ chạy thì bỏ lỡ lượt đó, không chạy bù hàng loạt.
 
 ## Bản đã cài
