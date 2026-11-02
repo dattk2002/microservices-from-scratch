@@ -1,0 +1,4 @@
+{
+  "id": "15-cqrs-read-model",
+  "entrypoints": ["orders.mts", "query.mts"]
+}
