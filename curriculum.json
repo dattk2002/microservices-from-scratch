@@ -181,5 +181,71 @@
       "https://microservices.io/patterns/data/cqrs.html",
       "https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs"
     ]
+  },
+  {
+    "id": "16-cache-aside",
+    "title": "Cache-aside, TTL và chống cache stampede",
+    "requirements": [
+      "Build independently runnable Catalog and cached-reader HTTP processes. Catalog owns source data; the reader uses a bounded in-memory cache with explicit TTL, eviction and stale-data semantics, validates upstream JSON, and has a bounded downstream deadline. Do not share stores or claim cache data is authoritative.",
+      "Coalesce concurrent misses for the same key into one bounded upstream load. Bound both cached entries and distinct in-flight loads; reject overload explicitly, release failed loads, and never cache exceptions as successful values. Use an injected clock and deferred promises for deterministic unit tests of exact expiry, eviction, coalescing, failure cleanup and capacity limits.",
+      "With real separate HTTP processes and synchronization barriers, prove cache hits avoid upstream work, simultaneous misses cause one upstream call, source changes remain stale only under the documented policy, failed loads can recover, and overload/deadline behavior is bounded. Document per-instance state, restart resets, invalidation tradeoffs and when caching is inappropriate."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside"
+    ]
+  },
+  {
+    "id": "17-durable-async-jobs",
+    "title": "Job bất đồng bộ lưu bền và HTTP 202",
+    "requirements": [
+      "Build independent job API/owner and worker processes communicating only over HTTP. The API owns a SQLite job database; POST returns202 with Location and Retry-After, a bounded status endpoint distinguishes queued/running/succeeded/failed states, and completed results have an explicit retrieval contract. Use a deterministic local computation rather than external side effects.",
+      "Persist admission and transitions; use atomic claims with a bounded lease and a fencing/claim token so an expired worker cannot complete a reclaimed job. Bound job admission and attempts; terminal failures stay inspectable. Test transition, lease-boundary, stale-token and retry policy with an injected clock and in-memory SQLite before implementation.",
+      "Use real API and worker processes, separate temporary paths and synchronization barriers to prove asynchronous acceptance/polling, success, terminal failure, competing workers and recovery after a worker dies and its lease expires, including rejection of stale completion. Document at-least-once computation, result retention, wall-clock lease limitations and why202 is not completion."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/asynchronous-request-reply",
+      "https://www.rfc-editor.org/rfc/rfc9110.html#name-202-accepted"
+    ]
+  },
+  {
+    "id": "18-service-authentication",
+    "title": "Danh tính dịch vụ, token ký và phân quyền",
+    "requirements": [
+      "Build independent caller and protected-resource HTTP processes demonstrating a small documented compact JWS/JWT profile signed with Ed25519 using node:crypto, never homemade cryptographic primitives. Pin EdDSA, an explicit token type, trusted issuer/audience and an allowlisted public key ID. Require safe-integer iat/nbf/exp seconds with iat<=nbf<=now<exp and exp-iat<=60, zero clock leeway, and an explicit service identity/scope policy. Never trust keys or URLs supplied by a token.",
+      "Use only throwaway locally generated demonstration key material, with no credential-store access, cloud identity provider or real secrets. Validate token size/shape, canonical base64url, signature, algorithm/type, key ID, issuer/audience and time claims before authorization. Distinguish missing/invalid authentication401 from valid identity lacking permission403; keep tokens and keys out of logs/errors. Use an injected clock for deterministic boundary and tampering unit tests.",
+      "With real separate HTTP processes prove allowed calls, absent/tampered/expired/wrong-audience tokens and denied scopes, plus rejecting unknown keys and algorithm confusion. Include fail-closed configuration checks and document that this is an educational narrow verifier, not a general JWT library, OAuth server or production identity system; bearer replay and transport confidentiality require controls outside this loopback HTTP demo, and production needs TLS and a maintained standards implementation."
+    ],
+    "references": [
+      "https://www.rfc-editor.org/rfc/rfc8725.html",
+      "https://www.rfc-editor.org/rfc/rfc8037.html",
+      "https://nodejs.org/docs/latest-v24.x/api/crypto.html"
+    ]
+  },
+  {
+    "id": "19-http-metrics",
+    "title": "Metrics HTTP, histogram và cardinality có giới hạn",
+    "requirements": [
+      "Build independently runnable gateway and downstream HTTP processes with per-process request counters, active-request gauges and a classic cumulative duration histogram exposed in documented Prometheus text format. Use Node built-ins only; no monitoring server, package or deployment is required.",
+      "Use bounded allowlisted route templates, methods and outcome/status labels; never label by raw URL, resource ID, request ID or client-provided values. Record completion exactly once across response finish/close, include dependency failures and caller disconnects, and exclude or clearly separate scrape traffic. Unit-test injected-clock observations, cumulative buckets including +Inf, count/sum, escaping and idempotent completion.",
+      "Use real independent processes to scrape both services over HTTP, compare exact business-request counters, synchronize concurrent work to observe an in-flight gauge, and prove cleanup after error/cancellation and bounded series under varied unknown paths. Explain rates over time, instance restart resets, safe aggregation, histogram approximation and why per-process metrics alone do not constitute an SLO/alerting platform."
+    ],
+    "references": [
+      "https://prometheus.io/docs/practices/instrumentation/",
+      "https://prometheus.io/docs/instrumenting/exposition_formats/",
+      "https://prometheus.io/docs/practices/histograms/"
+    ]
+  },
+  {
+    "id": "20-strangler-fig",
+    "title": "Strangler Fig và chuyển quyền sở hữu từng bước",
+    "requirements": [
+      "Build independent facade, original legacy application and extracted service processes, with the two providers owning separate SQLite databases. Demonstrate an incremental migration with explicit legacy-only, copy/cutover and extracted-owner phases while the facade preserves one public contract; do not share a database or dual-write business changes.",
+      "Define a deterministic, durable migration/ownership policy that prevents new writes during a bounded copy/cutover barrier, drains previously admitted legacy writes before taking the copy snapshot, validates copied data and resumes safely after interruption. After cutover exactly one provider owns writes and reads follow the same owner; routing must not silently fall back to a stale provider after an uncertain write. Unit-test legal/illegal phase transitions, route ownership and interruption recovery policy first.",
+      "Use real separate HTTP processes, temporary databases and a synchronized already-in-flight legacy write to prove unchanged public API behavior before/after migration, new writes during cutover rejected explicitly, data preservation, restart recovery and failure of the extracted owner without writes leaking back to legacy. Keep this a small original teaching application, document the facade bottleneck, migration downtime/data-volume limits and rollback requirements after new writes, and distinguish strangler migration from gateway aggregation."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig",
+      "https://martinfowler.com/bliki/StranglerFigApplication.html"
+    ]
   }
 ]
