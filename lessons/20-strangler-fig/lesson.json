@@ -1,0 +1,5 @@
+{
+  "id": "20-strangler-fig",
+  "title": "Strangler Fig và chuyển quyền sở hữu từng bước",
+  "entrypoints": ["facade.mts", "legacy.mts", "extracted.mts"]
+}
