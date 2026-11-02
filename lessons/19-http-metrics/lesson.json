@@ -1,0 +1,5 @@
+{
+  "id": "19-http-metrics",
+  "title": "Metrics HTTP, histogram và cardinality có giới hạn",
+  "entrypoints": ["gateway.mts", "downstream.mts"]
+}
