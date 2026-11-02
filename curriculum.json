@@ -142,5 +142,44 @@
     "references": [
       "https://microservices.io/patterns/data/saga.html"
     ]
+  },
+  {
+    "id": "13-bulkhead-isolation",
+    "title": "Bulkhead và cô lập tải giữa các dependency",
+    "requirements": [
+      "Build an independently runnable gateway and two downstream HTTP services with separate bounded per-dependency concurrency pools; reject excess work promptly with an explicit 503 contract rather than an unbounded queue.",
+      "Unit-test admission, idempotent release, configuration validation and release after success, errors and cancellation; acquire capacity before starting downstream work and always release it in finally.",
+      "Use real independent processes and synchronization barriers to fill one dependency pool, prove rejected calls never reach that dependency, and prove the other dependency remains usable; verify capacity returns after failure and deadline cancellation. Explain per-instance scope and distinguish bulkheads from circuit breakers and rate limits."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/bulkhead"
+    ]
+  },
+  {
+    "id": "14-token-bucket-rate-limiting",
+    "title": "Rate limiting bằng token bucket",
+    "requirements": [
+      "Build an independently runnable gateway and downstream service; use a token bucket per validated bounded demonstration client ID, explicit capacity/refill configuration, and HTTP 429 with a positive integer Retry-After when the client exhausts its budget. Reject before forwarding and never present an untrusted demo header as authentication.",
+      "Use an injected monotonic clock for deterministic unit tests covering initial burst, refill boundaries, retry delay rounding, invalid configuration and client isolation. Bound client-tracking memory with a documented full-capacity policy; idle expiry may remove only buckets that would already have fully refilled, so eviction cannot reset a depleted client's quota.",
+      "Use real independent HTTP processes to prove exact admitted/rejected requests through downstream counters, client isolation, validation and Retry-After responses. Explain per-instance limits, process restart resets, replica multiplication and why rate limiting does not bound concurrent slow requests."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/throttling",
+      "https://www.rfc-editor.org/rfc/rfc6585.html#section-4",
+      "https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after"
+    ]
+  },
+  {
+    "id": "15-cqrs-read-model",
+    "title": "CQRS và read model nhất quán cuối cùng",
+    "requirements": [
+      "Build independent Orders command and query/read-model processes with separate service-owned SQLite files. Orders atomically persists business state and durable event records; synchronize a query-optimized order summary over bounded HTTP requests without sharing database files or importing previous lessons.",
+      "Apply events and durable deduplication/checkpoint state atomically at the read model; define event IDs, per-order versions and explicit duplicate, conflicting and stale/out-of-order event contracts. Explain an explicit strategy for gaps rather than silently advancing past missing data.",
+      "Write meaningful pure policy or in-memory SQLite unit tests first. With real service processes, durable temporary files and synchronization barriers, prove observable stale reads while propagation is paused, eventual convergence, duplicate/version handling and producer/consumer restart recovery without double-counting. Document source-of-truth ownership, freshness metadata, bounded failures and why CQRS neither requires event sourcing nor guarantees immediate read-your-writes."
+    ],
+    "references": [
+      "https://microservices.io/patterns/data/cqrs.html",
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs"
+    ]
   }
 ]
