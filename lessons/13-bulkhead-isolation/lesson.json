@@ -1,0 +1,4 @@
+{
+  "id": "13-bulkhead-isolation",
+  "entrypoints": ["catalog.mts", "shipping.mts", "gateway.mts"]
+}
