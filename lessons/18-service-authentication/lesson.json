@@ -1,0 +1,5 @@
+{
+  "id": "18-service-authentication",
+  "title": "Danh tính dịch vụ, token ký và phân quyền",
+  "entrypoints": ["resource.mts", "caller.mts", "demo.mts"]
+}
