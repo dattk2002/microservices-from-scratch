@@ -1,0 +1,5 @@
+{
+  "id": "23-distributed-tracing",
+  "title": "Distributed tracing và quan hệ span qua nhiều dịch vụ",
+  "entrypoints": ["gateway.mts", "orders.mts", "catalog.mts"]
+}
