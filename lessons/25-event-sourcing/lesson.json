@@ -1,0 +1,5 @@
+{
+  "id": "25-event-sourcing",
+  "title": "Event sourcing, replay và snapshot có thể dựng lại",
+  "entrypoints": ["owner.mts", "reader.mts"]
+}
