@@ -1,0 +1,5 @@
+{
+  "id": "24-expand-contract-migration",
+  "title": "Thay đổi schema bằng Expand, Migrate và Contract",
+  "entrypoints": ["old.mts", "new.mts", "control.mts"]
+}
