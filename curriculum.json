@@ -247,5 +247,70 @@
       "https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig",
       "https://martinfowler.com/bliki/StranglerFigApplication.html"
     ]
+  },
+  {
+    "id": "21-service-discovery",
+    "title": "Service discovery và cân bằng tải phía client",
+    "requirements": [
+      "Build independent registry, Catalog instance and client HTTP processes. Run two instances from one Catalog entrypoint; the client resolves a logical service through the registry and uses deterministic round-robin across live registrations. Use bounded renewable leases, bounded registry capacity, validated instance IDs and loopback-only demo URLs; never follow caller-supplied arbitrary URLs. At most four manifest entrypoints.",
+      "Write deterministic injected-monotonic-clock unit tests first for exact lease expiry, renewal, removal, capacity and round-robin membership changes. Define safe registration ownership so a stale renewal/removal cannot replace or delete a newer incarnation. All HTTP calls have bounded deadlines; no automatic retries of unsafe writes, no unbounded stale registry cache, and explicit 503 when discovery has no usable instances.",
+      "Use real independent processes to prove requests reach both instances, deregistration/lease expiry removes an instance, a terminated instance causes a bounded failure, and recovery/membership refresh uses a replacement without routing indefinitely to stale addresses. Use synchronization or bounded observable polling rather than fragile sleeps. Document registry outage and single-point-of-failure tradeoffs; a lease is not proof an instance is healthy, and this local teaching registry is not DNS/Consul/Kubernetes."
+    ],
+    "references": [
+      "https://microservices.io/patterns/client-side-discovery.html",
+      "https://microservices.io/patterns/service-registry.html"
+    ]
+  },
+  {
+    "id": "22-optimistic-concurrency",
+    "title": "Optimistic concurrency với ETag và If-Match",
+    "requirements": [
+      "Build an independently runnable resource-owner HTTP service with service-owned SQLite and a separate HTTP client/editor process. GET returns a strong ETag tied to a durable resource version. Two clients read the same version and attempt updates: atomically compare-and-update version and data so exactly one wins and the other receives412 with no lost update; never automatically replay a conflicting mutation.",
+      "Document a deliberately narrow conditional-update contract: require exactly one strong version ETag in If-Match for PUT/PATCH, missing precondition428, unsupported/malformed header400 and stale valid version412. Validate input and integer version bounds; failed validation/preconditions never change data/version. Unit-test parsing and atomic store behavior first, including weak/wildcard/list headers and version exhaustion. Explain the narrow header profile rather than claiming full RFC conditional-request support.",
+      "With real owner and client processes and temporary SQLite, synchronize two updates against one ETag and assert one success, one412, exactly one version increment and the winning value. Prove retrieval after restart retains value/version, a client can explicitly re-read and revise a later update, and failures/dependency deadlines have explicit contracts. Distinguish optimistic concurrency from idempotency, distributed locks and multi-service transactions."
+    ],
+    "references": [
+      "https://www.rfc-editor.org/rfc/rfc9110.html#section-13.1.1",
+      "https://www.rfc-editor.org/rfc/rfc6585.html#section-3"
+    ]
+  },
+  {
+    "id": "23-distributed-tracing",
+    "title": "Distributed tracing và quan hệ span qua nhiều dịch vụ",
+    "requirements": [
+      "Build independent Gateway, Orders and Catalog HTTP processes propagating W3C traceparent through each hop. Demonstrate a documented version00 teaching profile: validate header shape, nonzero trace/span IDs and flags, generate fresh context on absent/invalid input, keep the trace ID across hops and generate distinct span IDs with explicit parent relationships. Use node:crypto and AsyncLocalStorage; do not claim to implement an OpenTelemetry SDK/exporter or full W3C version negotiation.",
+      "Write meaningful unit tests first with injected IDs/monotonic clock for parsing, parent-child construction, sampled-flag handling and span completion exactly once on finish/close/error. Emit bounded-size structured span records with allowlisted operation names, duration/status/outcome, without request bodies, authorization data or raw query strings. Explain traceparent versus tracestate, local clock durations versus cross-host clock ordering, and privacy/trust limits of caller-provided context.",
+      "With real independent processes, prove one request creates a connected parent-child tree across all three services, parallel/interleaved requests never mix contexts, valid inbound context is continued and invalid context creates a fresh trace. Synchronize a slow dependency and demonstrate its duration/error span; prove deadline/disconnect cleanup and exactly-once span completion. Use bounded local observation/log capture, no external collector or runtime dependency. Distinguish this from lesson08 correlation IDs and lesson19 aggregate metrics."
+    ],
+    "references": [
+      "https://www.w3.org/TR/trace-context-1/",
+      "https://nodejs.org/docs/latest-v24.x/api/async_context.html"
+    ]
+  },
+  {
+    "id": "24-expand-contract-migration",
+    "title": "Thay đổi schema bằng Expand, Migrate và Contract",
+    "requirements": [
+      "Build an original Catalog service with old/new executable versions and a migration/control entrypoint, using a single Catalog-owned SQLite database. Other business services never read its file. Demonstrate durable expand, resumable bounded backfill/migrate and contract phases for replacing a field while the HTTP business meaning remains stable. Old/new binaries represent versions/replicas of the same data owner, not independently owned services sharing a database.",
+      "Choose and document an explicit compatibility/write synchronization mechanism so old-version writes during backfill cannot be lost or leave new fields stale. Bound each backfill batch, commit progress atomically with row changes and safely resume after interruption. Forbid destructive contract while an old version can still write: use a real enforced retirement/admission barrier that drains admitted writes, not merely an unchecked user boolean. After contract old code must fail closed; rollback is supported only within its stated compatibility window. Unit-test phase guards, backfill interruption and concurrent-write preservation first.",
+      "Use real separate old/new service processes and HTTP requests with temporary SQLite and barriers to prove compatibility before contract, a concurrent old write survives backfill, interrupted backfill resumes without omissions, early contract is rejected, old writer retirement/drain is enforced, and new code works after contract/restart. Explain SQLite DDL locking, any bounded maintenance window, migration ownership and irreversible cleanup; do not claim production zero downtime or distributed dual-write atomicity."
+    ],
+    "references": [
+      "https://martinfowler.com/bliki/ParallelChange.html",
+      "https://nodejs.org/docs/latest-v24.x/api/sqlite.html"
+    ]
+  },
+  {
+    "id": "25-event-sourcing",
+    "title": "Event sourcing, replay và snapshot có thể dựng lại",
+    "requirements": [
+      "Build independent cart event-owner and reader HTTP processes. The owner stores immutable intent events in its own SQLite append-only stream; the reader obtains events only over bounded HTTP and reconstructs state without sharing the database. Model a small local cart with creation, item additions/removals and checkout, integer quantities and no real payment. The event stream is authoritative; snapshots are optional derived accelerators that can be discarded and rebuilt.",
+      "Write pure reducer/command and in-memory SQLite unit tests first for deterministic replay, domain invariants, event schema/version/sequence validation and expected-version appends. Atomically append against the expected stream version so concurrent conflicting commands cannot both commit. Bound carts, events per stream, page/batch sizes and operation deadlines. Define duplicate command handling or an explicit no-blind-retry contract; replay must never execute network/business side effects. Include a validated derived snapshot with fallback to full replay on unusable snapshot and explain its trust/invalidation limits.",
+      "Use real independent processes to prove command/history/state contracts, concurrent expected-version conflicts, restart reconstruction and reader reconstruction from paged events. Prove discarding snapshots yields identical state and malformed/out-of-order history is rejected rather than silently applied; document schema evolution/upcasting boundaries, replay cost and when CRUD is simpler. Distinguish event sourcing from lesson11 outbox and lesson15 CQRS; do not claim exactly-once delivery or cross-aggregate transactions."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing",
+      "https://martinfowler.com/eaaDev/EventSourcing.html"
+    ]
   }
 ]
