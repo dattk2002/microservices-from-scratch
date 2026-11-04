@@ -1,0 +1,5 @@
+{
+  "id": "21-service-discovery",
+  "title": "Service discovery và cân bằng tải phía client",
+  "entrypoints": ["registry.mts", "catalog.mts", "client.mts"]
+}
