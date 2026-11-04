@@ -1,0 +1,5 @@
+{
+  "id": "22-optimistic-concurrency",
+  "title": "Optimistic concurrency với ETag và If-Match",
+  "entrypoints": ["owner.mts", "client.mts"]
+}
