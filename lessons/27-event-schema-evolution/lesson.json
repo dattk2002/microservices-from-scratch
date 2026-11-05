@@ -1,0 +1,5 @@
+{
+  "id": "27-event-schema-evolution",
+  "title": "Tiến hóa schema sự kiện và upcasting không sửa lịch sử",
+  "entrypoints": ["owner.mts", "consumer.mts"]
+}
