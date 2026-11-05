@@ -21,11 +21,12 @@ TypeScript được **kiểm tra kiểu bằng tsc**, rồi Node chạy `.mts` b
 ## Bài học
 
 - [01 — Ranh giới dịch vụ và HTTP](lessons/01-service-boundaries-http/README.md)
-- [Lộ trình hữu hạn25 bài](curriculum.json): hợp đồng API, dữ liệu riêng,
+- [Lộ trình hữu hạn30 bài](curriculum.json): hợp đồng API, dữ liệu riêng,
   deadline, idempotency, retry, circuit breaker, correlation log, gateway,
   graceful shutdown, outbox, saga, bulkhead, rate limiting, CQRS, cache-aside,
   job bất đồng bộ, xác thực dịch vụ, metrics, chuyển đổi Strangler Fig, discovery,
-  optimistic concurrency, tracing, schema migration và event sourcing.
+  optimistic concurrency, tracing, schema migration, event sourcing, dead-letter,
+  tiến hóa schema sự kiện, phân trang keyset, anti-corruption layer và hedging.
   Bài hoàn chỉnh được thêm lần lượt trong `lessons/`.
 
 Mỗi bài có `lesson.json`, mã nguồn, test gọi HTTP giữa các tiến trình thật,
