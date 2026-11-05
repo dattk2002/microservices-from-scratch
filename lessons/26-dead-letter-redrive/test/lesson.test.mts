@@ -114,6 +114,25 @@ async function setup(t: TestContext, lease = '3000', controls = '1') {
   return { owner, sink, consumer, start, admit, step, inspect };
 }
 
+test('integration: non-string completion outcomes cannot consume an active claim', async t => {
+  const f = await setup(t);
+  await f.admit('strict-outcome', 'current');
+  const claim = await data(await request(f.owner, '/claim', {}));
+  assert.ok(claim.message !== null && typeof claim.message === 'object');
+  const message = Object.fromEntries(Object.entries(claim.message));
+  assert.equal(typeof message.token, 'string');
+  for (const outcome of [['ok'], ['poison'], ['transient']]) {
+    await data(await request(f.owner, '/finish', {
+      id: 'strict-outcome', token: message.token, outcome,
+    }), 400);
+    assert.equal((await f.inspect('strict-outcome')).state, 'running');
+  }
+  await data(await request(f.owner, '/finish', {
+    id: 'strict-outcome', token: message.token, outcome: 'ok',
+  }));
+  assert.equal((await f.inspect('strict-outcome')).state, 'done');
+});
+
 test('integration: poison isolation, inspection, restart, conditional redrive and explicit durable handler fix', async t => {
   const f = await setup(t);
   const original = await f.admit('legacy-invoice', 'legacy');

@@ -15,8 +15,8 @@ export async function main() {
       if (path === '/claim') return json(res, 200, { message: q.claim() ?? null });
       if (path === '/finish') {
         const id = identity(p.id);
-        if (typeof p.token !== 'string' || p.token.length > 64 || !['ok', 'poison', 'transient'].includes(String(p.outcome))) throw new HttpError(400, 'input', 'Invalid finish');
-        if (!q.finish(id, p.token, String(p.outcome))) throw new HttpError(409, 'stale', 'Claim no longer valid');
+        if (typeof p.token !== 'string' || p.token.length > 64 || typeof p.outcome !== 'string' || !['ok', 'poison', 'transient'].includes(p.outcome)) throw new HttpError(400, 'input', 'Invalid finish');
+        if (!q.finish(id, p.token, p.outcome)) throw new HttpError(409, 'stale', 'Claim no longer valid');
         return json(res, 200, q.get(id));
       }
       if (path === '/redrive') {
