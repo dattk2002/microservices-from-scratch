@@ -312,5 +312,70 @@
       "https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing",
       "https://martinfowler.com/eaaDev/EventSourcing.html"
     ]
+  },
+  {
+    "id": "26-dead-letter-redrive",
+    "title": "Dead-letter queue, poison message và redrive có kiểm soát",
+    "requirements": [
+      "Build independent durable queue-owner, consumer and idempotent sink HTTP processes with separate service-owned SQLite files. Focus on poison-message quarantine and operator redrive beyond lesson17 job terminal failure: transient failures have a finite attempt budget and poison messages enter an inspectable dead-letter state with a bounded allowlisted reason; an unrelated valid message can still complete. A manual bounded HTTP processing step is sufficient; no external broker or background polling is required.",
+      "Preserve original message ID and payload across redrive, and keep durable attempt/redrive audit counters. Redrive is an explicit conditional transition from dead-letter to queued, with a finite redrive-cycle limit; concurrent or stale redrive requests cannot reset active work or create duplicate queue entries. Claims need bounded leases and fencing so stale completions fail, and uncertain sink responses must not justify duplicate business effects: the sink atomically deduplicates by operation ID plus payload fingerprint. Bound queue admission, payloads, batches and processing concurrency. Write meaningful policy/in-memory SQLite unit assertions first.",
+      "Use real independent processes and temporary databases to prove poison isolation, attempts exhausted into DLQ, inspection, restart persistence, stale/concurrent redrive rejection and successful reprocessing only after an explicit simulated handler fix, without changing the message identity or data. Prove a lost/duplicate delivery cannot double-apply the sink effect and validate all unrelated failure-path payload fields. Explain at-least-once delivery, retention and audit limits, lease clock assumptions, manual operational decisions and why this is a small teaching queue, not an Azure/RabbitMQ implementation."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-dead-letter-queues",
+      "https://microservices.io/patterns/communication-style/idempotent-consumer.html"
+    ]
+  },
+  {
+    "id": "27-event-schema-evolution",
+    "title": "Tiến hóa schema sự kiện và upcasting không sửa lịch sử",
+    "requirements": [
+      "Build independent producer/event-owner and consumer HTTP processes with separate SQLite databases. The owner keeps immutable bounded raw integration events with identity, ordered source position, explicit schema revision and bounded JSON payload. The consumer applies a deterministic v1-to-v2 upcaster into one canonical model; preserve event identity/source position and never rewrite historical producer records. A suggested example makes v1 integer totalCents explicitly USD and v2 nested amountMinor/currency, so the v1 currency default is a documented historical invariant, never a guess.",
+      "Write pure runtime parsing/upcasting and in-memory SQLite unit tests first for both supported revisions, invalid shapes/types/unsafe numbers, deterministic conversion, immutable inputs and unknown revisions. Distinguish schema revision from source sequence and business-resource version. Unknown/incompatible revisions fail closed without advancing the consumer checkpoint. Apply the canonical effect, durable deduplication fingerprint and checkpoint atomically; define conflicting reuse of an event ID explicitly. Bound pages, source retention and all HTTP operations; no dynamic code/schema loading or silent skipping of unknown records.",
+      "With real processes prove mixed v1/v2 records yield the same intended business meaning, the producer raw history stays unchanged, duplicate delivery does not reapply effects, conflicting identity is rejected, and an older consumer profile stops on v2 before a supported upgraded profile resumes after restart without losing/double-counting earlier events. Test unknown-version and malformed-history rejection with valid surrounding envelopes. Explain additive versus breaking changes, explicit defaults, upcaster-chain maintenance and rollout order. Keep this about event-format evolution, not a second CQRS/event-sourcing framework."
+    ],
+    "references": [
+      "https://docs.axoniq.io/axon-framework-reference/4.11/events/event-versioning/",
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing"
+    ]
+  },
+  {
+    "id": "28-keyset-pagination",
+    "title": "Phân trang keyset, snapshot hữu hạn và checkpoint tiếp tục",
+    "requirements": [
+      "Build independent resource-owner and scanner HTTP processes with separate SQLite stores. The owner serves a keyset-paginated snapshot ordered by a unique immutable key using an indexed seek rather than OFFSET. Limit the demo to100 live resources,8 concurrent snapshots,10 rows per page and a documented finite TTL. Snapshot creation atomically copies the selected bounded data inside the owner store, so later inserts/updates/deletes cannot cause omissions, duplicates or changed values in that scan.",
+      "Use opaque locally generated random continuation tokens backed by immutable server-side session/position records; tokens bind filter and page size, are never interpreted as URLs or SQL by the scanner, and replaying one token returns the same page without allocating unbounded new cursor records. Persist sessions/tokens so restart behavior is explicit; expiry/unknown cursors and mismatched filters fail with documented contracts rather than silently starting a new scan. Scanner stores each page result and its next checkpoint atomically in its own SQLite; retries after an uncertain page/commit outcome must not skip or double-apply rows. Bound scans, response bytes and total/page deadlines. Unit-test injected-clock expiry boundaries, seeks, binding, replay and capacity first.",
+      "With real processes and barriers prove a scan sees the initial snapshot while source rows are inserted/deleted/changed between pages, every selected key appears exactly once, and scanner restart resumes the same valid checkpoint. Inject a page-application interruption before commit and prove a retry is safe; test owner restart, token expiry/malformed tokens and full snapshot capacity. Explain snapshot storage cost, finite retention, wall-clock assumptions and deliberate new-scan semantics after expiry. Do not claim keyset pagination alone gives snapshot isolation or implement Graph/OData."
+    ],
+    "references": [
+      "https://www.sqlite.org/rowvalue.html",
+      "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md"
+    ]
+  },
+  {
+    "id": "29-anti-corruption-layer",
+    "title": "Anti-corruption layer và chuyển đổi ngữ nghĩa hệ thống cũ",
+    "requirements": [
+      "Build independent legacy provider, anti-corruption adapter and domain Orders/quote HTTP processes. The legacy provider uses a deliberately different wire/domain model: legacy SKU aliases, decimal-string unit prices, pack quantities and status codes. The adapter alone maps to a validated canonical product model with integer-cent prices, currency, available units and explicit availability; Orders uses only that canonical contract. Keep monetary data simulated with no payment integration or external APIs.",
+      "Write pure translation/validation unit tests first for exact decimal-to-integer conversion without floating rounding, safe integer overflow, pack-to-unit bounds, mismatched product identities, missing/ambiguous fields, unsupported currencies/statuses and documented not-found/unavailable mapping. Reject unknown semantics instead of inventing defaults or treating dependency failure as zero stock. Bound and validate every upstream response, use fixed trusted loopback origins and deadlines, and do not follow redirects. Keep legacy identifiers, status branching and conversion rules out of Orders.",
+      "Use real independent processes to prove valid translation and quote totals, missing product behavior, malformed/ambiguous legacy data rejection, transient provider failure/deadline and recovery. Include controlled legacy-format/scenario changes that leave the public domain contract stable without modifying consumer code. Teaching-control endpoints may be explicitly enabled for deterministic fixtures and Playground scenarios. Explain added latency, adapter ownership, mapping maintenance and the difference from gateway aggregation, API field renaming and Strangler ownership migration; do not claim the adapter repairs contradictory business data."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer",
+      "https://nodejs.org/docs/latest-v24.x/api/http.html"
+    ]
+  },
+  {
+    "id": "30-request-hedging",
+    "title": "Request hedging cho GET, ngân sách tải và hủy nhánh thua",
+    "requirements": [
+      "Build independent hedging-client and two read-only replica HTTP processes (replicas may share one entrypoint). Start one primary GET immediately; launch at most one secondary after a finite hedge delay when the primary is unresolved. Use the first valid successful response, cancel outstanding attempts and enforce one overall deadline. Only explicit safe read routes may hedge; reject POST/other unsafe mutations before forwarding. Describe this as an original bounded HTTP teaching policy inspired by hedging, not a gRPC implementation.",
+      "Write deterministic unit assertions first using an injected scheduler/clock and deferred promises for a fast primary suppressing the hedge, delayed secondary winning, nonfatal failures, fatal response policy, all attempts failing, deadline/disconnect cancellation and ignored late results. Validate bounded upstream bodies and logical resource identity before accepting a winner. Define which HTTP failures are fatal versus eligible for the second attempt; never allow an early transient error to mask a still-possible valid result. Bound per-operation attempts at2 and process-wide concurrent extra hedge attempts with a non-queuing skip policy; every path releases timers, permits and abort listeners.",
+      "With real separate replicas and synchronization barriers prove fast-primary sends one request, a held primary lets the secondary win, losing work observes cancellation and active counts return to0, caller disconnect/deadline cancels all branches, malformed success is not accepted, and hedge-capacity saturation cannot create an unbounded queue. Use counters/observable barriers rather than elapsed-time race guesses. Explain tail latency versus average latency, duplicated read cost, best-effort cancellation, consistency requirements between replicas and the distinction from sequential retry, bulkheads and circuit breakers. Use only loopback demo replicas and no external network."
+    ],
+    "references": [
+      "https://grpc.io/docs/guides/request-hedging/",
+      "https://www.rfc-editor.org/rfc/rfc9110.html#name-safe-methods"
+    ]
   }
 ]
