@@ -1,0 +1,5 @@
+{
+  "id": "29-anti-corruption-layer",
+  "title": "Anti-corruption layer và chuyển đổi ngữ nghĩa hệ thống cũ",
+  "entrypoints": ["legacy.mts", "adapter.mts", "orders.mts"]
+}
