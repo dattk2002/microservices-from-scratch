@@ -1,0 +1,5 @@
+{
+  "id": "31-consumer-driven-contracts",
+  "title": "Consumer-driven contracts và kiểm chứng provider tương thích",
+  "entrypoints": ["provider.mts", "consumer.mts", "verifier.mts"]
+}
