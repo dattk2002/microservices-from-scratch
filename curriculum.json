@@ -377,5 +377,70 @@
       "https://grpc.io/docs/guides/request-hedging/",
       "https://www.rfc-editor.org/rfc/rfc9110.html#name-safe-methods"
     ]
+  },
+  {
+    "id": "31-consumer-driven-contracts",
+    "title": "Consumer-driven contracts và kiểm chứng provider tương thích",
+    "requirements": [
+      "Build independent provider, consumer and contract-verifier HTTP processes. The consumer owns a small static typed interaction catalogue in .mts (not an extra JSON file), describing requests and the minimal response fields/statuses it actually uses. The provider must not import consumer contracts or matching rules. Use fixed bounded product-found and product-missing scenarios and show both consumer behavior and provider verification. This is an original built-in-only teaching verifier, not Pact or a compatible Pact format.",
+      "Write meaningful unit assertions first for request construction and response matching: required field absence/type changes/status changes fail, permitted additive fields pass, invalid primitive types and unknown interactions reject. Reuse the actual consumer request builder/parser in its contract checks rather than returning canned reports; keep independent provider fixtures so sharing an implementation cannot make both sides tautologically pass. The verifier accepts only configured loopback origin, never a caller URL; bound interactions, request/response bytes and total/per-request deadlines. Failure reports identify interaction and mismatch without exposing secrets.",
+      "With real separate processes prove compatible and additive provider revisions pass verification and the consumer still computes the intended value; breaking removal/type/status changes fail verification and consumer parsing. Include inspectable bounded teaching scenarios gated TEACHING_CONTROLS=1, recovery and inert-import tests. Explain consumer versus provider ownership, provider states, contract tests versus unit/integration/end-to-end tests, and that passing contracts do not prove business correctness or authorize deployment."
+    ],
+    "references": [
+      "https://docs.pact.io/getting_started/how_pact_works",
+      "https://docs.pact.io/getting_started/provider_verification"
+    ]
+  },
+  {
+    "id": "32-streaming-backpressure",
+    "title": "NDJSON streaming, backpressure và hủy luồng có giới hạn",
+    "requirements": [
+      "Build independent HTTP NDJSON producer and consuming service processes. Producer streams at most64 bounded records plus an explicit terminal record; consumer validates ordered unique sequence, schema and terminal completion across arbitrary UTF-8/chunk boundaries. Keep each encoded line at most2048 bytes and the full stream at most131072 bytes; derive compatible limits including JSON escaping. Return a bounded JSON summary only after a complete valid stream; truncation, malformed records and missing terminal cannot be reported as successful partial results.",
+      "Write pure parser and injected-writer unit assertions first. A write returning false must stop pulling/generating records until drain; error, close, caller abort and deadline must remove listeners and release admission. Bound application buffers, concurrent streams (max2) and overall/per-read deadlines. Real server high-water mark may be configured with Node built-ins so a bounded response deterministically exercises write(false); document application versus kernel/transport buffering, and do not claim TCP memory is controlled by a JavaScript queue limit. No top-level listeners or external stream packages.",
+      "With real processes and observable barriers/counters prove complete streaming, real write(false)/drain handling, cancellation cleanup and saturation rejection. Failure fixtures for oversized lines/streams must satisfy unrelated schema/sequence fields, and malformed/truncated teaching modes must be explicit and gated TEACHING_CONTROLS=1. Test split UTF-8, boundary lengths, delayed drain, close while waiting, invalid terminal and restart/import cleanup. Explain streaming versus buffered JSON, bounded backpressure, at-most-in-flight work after cancellation and why streaming alone provides no replay/exactly-once guarantee."
+    ],
+    "references": [
+      "https://nodejs.org/docs/latest-v24.x/api/stream.html",
+      "https://nodejs.org/docs/latest-v24.x/api/http.html"
+    ]
+  },
+  {
+    "id": "33-leader-lease-fencing",
+    "title": "Leader lease, fencing token và chặn leader cũ ghi dữ liệu",
+    "requirements": [
+      "Build independent durable SQLite lease coordinator, two worker processes sharing one worker entrypoint, and a separate durable fenced sink. Coordinator grants one named leadership lease to a bounded holder identity, allocates a strictly increasing fencing generation, renews/releases only the exact current holder+generation while valid, and persists generations across restart. Workers make explicit bounded acquire/renew/write calls; no background election polling or external consensus system is required.",
+      "Write injected-clock/in-memory SQLite unit assertions first for exact expiry boundary, concurrent-style conditional grants, stale renew/release, monotonic restart generations and sink fencing. Sink atomically remembers the highest accepted generation and rejects lower generations before applying an idempotent operation receipt. Bind operation identity to immutable payload; duplicate replay cannot apply effects again, conflicting reuse rejects, and retained receipts have a finite admission bound. Crucial boundary: fencing stops older writes after the sink has observed a newer generation, not automatically at lease expiry or the instant a new grant is issued. Document the trusted non-Byzantine loopback participants; a generation is not an authentication credential.",
+      "With real processes prove only one current lease, takeover after expiry, stale-renew rejection, newer-generation sink activation followed by rejected stale-worker write, deduplication and coordinator/sink restart. Prefer explicit gated TEACHING_CONTROLS=1 clock-advance/stale-worker simulation or observable barriers over sleep races; keep normal paths checking their lease and controls clearly local-only. Bound HTTP bodies, calls, leases and storage. Explain clock assumptions, paused workers, single-coordinator availability and why this is not Raft/Kubernetes/production distributed locking."
+    ],
+    "references": [
+      "https://kubernetes.io/docs/concepts/architecture/leases/",
+      "https://www.sqlite.org/lang_transaction.html"
+    ]
+  },
+  {
+    "id": "34-state-reconciliation",
+    "title": "Reconciliation và sửa read model khi mất thông báo",
+    "requirements": [
+      "Build independent authoritative resource-owner, durable SQLite projection and manual reconciliation HTTP processes. Owner retains at most16 resource identities including tombstones, with monotonic per-resource versions and bounded values. A bounded atomic full snapshot (not another pagination framework) provides authoritative current state including deletions; dropping a notification must not lose this source of truth. Focus on pull anti-entropy repair beyond lesson15 normal event delivery.",
+      "Write unit assertions first for monotonic idempotent projection apply, duplicate versions, stale updates, same-version conflicting payload and tombstone protection. Repair only older/missing states; never silently overwrite an equal-version conflict or resurrect a newer deletion. Reconciliation accepts only configured origins, reads one bounded validated snapshot and applies at most16 repairs with bounded concurrency/deadlines/bytes. Partial repair failure may leave already applied records; repeated full runs safely converge without pretending there is a cross-service transaction. Report conflicts explicitly and document finite tombstone retention/admission.",
+      "With real processes prove a deliberately dropped update/deletion is detected and repaired, rerunning applies no duplicate changes, stale notifications after repair are ignored, and owner/projection restarts preserve versions and deletion state. Include dependency failure, partial progress/retry and an observable equal-version-conflict case using narrowly gated teaching controls if necessary. Explain desired/current state, periodic scheduling as an operational choice (manual /run is sufficient), repair lag, authority and why reconciliation neither replaces an outbox nor repairs contradictory equal-version business data automatically."
+    ],
+    "references": [
+      "https://kubernetes.io/docs/concepts/architecture/controller/",
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/materialized-view"
+    ]
+  },
+  {
+    "id": "35-tenant-isolation",
+    "title": "Cô lập tenant trong context, truy vấn và idempotency",
+    "requirements": [
+      "Build independent demo gateway and durable document-service HTTP processes. Gateway maps two explicitly simulated principals to two tenants and signs a bounded tenant context with a locally generated Ed25519 key; document service independently verifies pinned public key, issuer/audience, expiry and primitive tenant/subject claims. Native commands generate ephemeral demo keys with Node; no external credentials or identity service. For Playground use private/public PEM environment values (the existing manager supports $auth.private and $auth.public). The demo principal selector is enabled only by TEACHING_CONTROLS=1 and must be described as simulated identity, not real login security.",
+      "Write pure context validation and in-memory SQLite isolation assertions first. Resolve tenant exclusively from verified context; raw x-tenant headers, query/body tenant overrides, missing/tampered/expired/wrong-audience context cannot select storage. Every document read/list/write and idempotency receipt uses tenant-qualified keys. Both tenants can reuse the same document ID and operation ID independently; replay deduplicates only within that tenant and conflicts remain local. Bound at20 documents and40 retained operation receipts per tenant with explicit full-capacity rejection, not unsafe receipt eviction. No process-global mutable current-tenant state or unqualified shared cache keys.",
+      "With real independent processes prove scoped reads/lists/writes, cross-tenant guessed IDs indistinguishable from missing, same IDs and receipts in both tenants without leakage, conflicting payload replay inside one tenant, concurrent mixed-tenant requests and durable isolation after restart. Test spoofed tenant hints, signed-context validation failures and one tenants capacity not blocking the others admitted writes. Bound headers/bodies/upstream responses and deadlines. Explain authentication versus tenant authorization, shared-table isolation tradeoffs, demonstration identity boundary and why signatures alone cannot fix a missing tenant predicate."
+    ],
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/considerations/tenancy-models",
+      "https://nodejs.org/docs/latest-v24.x/api/crypto.html"
+    ]
   }
 ]
