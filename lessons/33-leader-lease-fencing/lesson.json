@@ -1,0 +1,5 @@
+{
+  "id": "33-leader-lease-fencing",
+  "title": "Leader lease, fencing token và chặn leader cũ ghi dữ liệu",
+  "entrypoints": ["coordinator.mts", "sink.mts", "worker.mts"]
+}
