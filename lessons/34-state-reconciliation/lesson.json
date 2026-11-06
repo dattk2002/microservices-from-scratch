@@ -1,0 +1,5 @@
+{
+  "id": "34-state-reconciliation",
+  "title": "Reconciliation và sửa read model khi mất thông báo",
+  "entrypoints": ["owner.mts", "projection.mts", "reconciler.mts"]
+}
