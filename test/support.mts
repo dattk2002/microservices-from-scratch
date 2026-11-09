@@ -7,8 +7,9 @@ import type { ChildProcess } from 'node:child_process';
 export type RunningService = { url: string; child: ChildProcess; stop: () => Promise<void> };
 
 export async function startService(entry: URL, env: Record<string, string> = {}): Promise<RunningService> {
-  const child = spawn(process.execPath, [fileURLToPath(entry)], {
-    env: { PATH: process.env.PATH ?? '', HOST: '127.0.0.1', PORT: '0', ...env },
+  // Concurrent test files share a small PID budget; bound each fixture's background pools.
+  const child = spawn(process.execPath, ['--v8-pool-size=1', fileURLToPath(entry)], {
+    env: { PATH: process.env.PATH ?? '', HOST: '127.0.0.1', PORT: '0', ...env, UV_THREADPOOL_SIZE: '1' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let stderr = '';
