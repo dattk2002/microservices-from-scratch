@@ -109,17 +109,17 @@ test('integration: bounded upstream parsing identity value redirects and deadlin
   try {
     const dest=await startService(replica,{ACTOR_ID:'b',DB_PATH:join(dir,'b.db')});services.push(dest);
     const before=await get(dest.url);
+    const sink=await startService(new URL('./upstream.mts',import.meta.url),{VARIANT:'valid'}); services.push(sink);
+    const source=await startService(new URL('./upstream.mts',import.meta.url),{VARIANT:'valid',TARGET_ORIGIN:sink.url}); services.push(source);
+    const exchange=await startService(sync,{REPLICA_A_ORIGIN:source.url,REPLICA_B_ORIGIN:dest.url,REPLICA_C_ORIGIN:dest.url,SYNC_TIMEOUT_MS:'300'}); services.push(exchange);
     for(const mode of ['malformed','identity','value','oversized','redirect','timeout','body-timeout','escaped']) {
-      const sink=await startService(new URL('./upstream.mts',import.meta.url),{VARIANT:'valid'}); services.push(sink);
-      const source=await startService(new URL('./upstream.mts',import.meta.url),{VARIANT:mode,TARGET_ORIGIN:sink.url}); services.push(source);
-      const exchange=await startService(sync,{REPLICA_A_ORIGIN:source.url,REPLICA_B_ORIGIN:dest.url,REPLICA_C_ORIGIN:dest.url,SYNC_TIMEOUT_MS:'300'}); services.push(exchange);
+      assert.deepEqual(await post(source.url,'/mode',{mode}),{mode});
       await post(exchange.url,'/sync',{from:'a',to:'b'},mode==='escaped'?200:502);
       const stats=await fetch(source.url+'/stats',{signal:AbortSignal.timeout(2000)}).then(r=>r.json());
       assert.deepEqual(stats,{reads:1,escaped:0});
       assert.deepEqual(await fetch(sink.url+'/stats',{signal:AbortSignal.timeout(2000)}).then(r=>r.json()),{reads:0,escaped:0});
       if(mode!=='escaped') assert.deepEqual(await get(dest.url),before);
       else assert.equal((await get(dest.url)).value,3000000);
-      await exchange.stop();await source.stop();await sink.stop();
     }
   } finally {await Promise.all(services.map(s=>s.stop()));await rm(dir,{recursive:true,force:true});}
 });

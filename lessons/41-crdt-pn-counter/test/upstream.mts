@@ -1,7 +1,13 @@
-import { json, serve } from '../../../lib/http.mts';
+import { HttpError, json, readJson, serve } from '../../../lib/http.mts';
 export async function main() {
-  const mode=process.env.VARIANT; let reads=0,escaped=0;
-  await serve('fixture',0,(req,res)=>{
+  let mode=process.env.VARIANT ?? 'valid'; let reads=0,escaped=0;
+  const modes=['valid','malformed','identity','value','oversized','redirect','timeout','body-timeout','escaped'];
+  await serve('fixture',0,async(req,res)=>{
+    if(req.method==='POST' && req.url==='/mode') {
+      const input=await readJson(req);
+      if(!input || typeof input!=='object' || Array.isArray(input) || !('mode' in input) || typeof input.mode!=='string' || !modes.includes(input.mode) || Object.keys(input).length!==1) throw new HttpError(400,'invalid_mode','Invalid fixture mode');
+      mode=input.mode; reads=0; escaped=0; return json(res,200,{mode});
+    }
     if(req.url==='/stats') return json(res,200,{reads,escaped});
     if(req.url==='/escaped') escaped++;
     if(req.url==='/state') reads++;
