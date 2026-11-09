@@ -1,0 +1,5 @@
+{
+  "id": "45-traffic-shadowing",
+  "title": "Traffic shadowing, so sánh bản mới và giới hạn tải quan sát",
+  "entrypoints": ["backend.mts", "gateway.mts"]
+}
