@@ -100,8 +100,17 @@ test('integration: separate caller and resource enforce authentication and permi
   const now = Math.floor(Date.now() / 1000);
   const current = { ...claims, iat: now, nbf: now, exp: now + 60 };
   const good = token(current);
+  const parts = good.split('.');
+  const encodedSignature = parts[2];
+  assert.ok(encodedSignature);
+  const signature = Buffer.from(encodedSignature, 'base64url');
+  const firstByte = signature[0];
+  assert.ok(firstByte !== undefined);
+  signature[0] = firstByte ^ 1;
+  const tampered = `${parts[0]}.${parts[1]}.${signature.toString('base64url')}`;
+  assert.notEqual(tampered, good);
   const cases: [string | undefined, number][] = [
-    [undefined, 401], [good.slice(0, -3) + 'AAA', 401],
+    [undefined, 401], [tampered, 401],
     [token({ ...current, iat: now - 61, nbf: now - 61, exp: now - 1 }), 401],
     [token({ ...current, aud: 'other' }), 401], [token({ ...current, scope: 'reports:write' }), 403],
     [token({ ...current, sub: 'other' }), 403],
