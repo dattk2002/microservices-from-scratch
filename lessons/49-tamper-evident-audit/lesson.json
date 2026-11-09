@@ -1,0 +1,1 @@
+{"id":"49-tamper-evident-audit","title":"Audit log hash-chain và checkpoint độc lập phát hiện rollback hoặc viết lại","entrypoints":["logger.mts","auditor.mts"]}
