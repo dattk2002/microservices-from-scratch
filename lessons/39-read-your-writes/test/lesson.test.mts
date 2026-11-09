@@ -75,6 +75,7 @@ test('integration: malformed lag source returns502 without a primary request',as
    const response=await get(gateway.url+'/items/a?minVersion=1');
    assert.deepEqual(await(await get(primary.url+'/count')).json(),{count:0},'malformed lag must not reach primary');
    assert.equal(response.status,502);await response.arrayBuffer();
+   await gateway.stop();await replica.stop();
   }
   const replica=await launch('./upstream.mts',{VARIANT:'lag-valid'});
   const gateway=await launch('../gateway.mts',{PRIMARY_ORIGIN:primary.url,REPLICA_ORIGIN:replica.url});
