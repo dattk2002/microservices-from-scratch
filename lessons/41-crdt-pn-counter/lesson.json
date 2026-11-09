@@ -1,0 +1,1 @@
+{"id":"41-crdt-pn-counter","entrypoints":["replica.mts","sync.mts"]}
