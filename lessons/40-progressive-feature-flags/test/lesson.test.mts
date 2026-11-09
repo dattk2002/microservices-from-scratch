@@ -129,6 +129,7 @@ test('integration: two processes converge, persist config, expire independently 
     const rotated:string[]=[];
     for(let i=0;i<24;i++) { const x=await hello(a,`p-${i}`); assert.deepEqual(x,await hello(b,`p-${i}`)); rotated.push(x.variant); }
     assert.notDeepEqual(rotated,larger);
+    await a.stop(); await b.stop();
     // Control restart preserves a safe version and content; gateway cold restart does not.
     await control.stop();
     control=await start('control',controlEnv);
