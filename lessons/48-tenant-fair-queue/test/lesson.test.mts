@@ -57,8 +57,11 @@ test('unit: imports are silent with invalid configuration and never open SQLite'
  const r=await promisify(execFile)(process.execPath,['--input-type=module','-e',code],{timeout:3000,env:{...process.env,DB_PATH:'/impossible/missing/db',PORT:'bad',EXECUTOR_ORIGIN:'bad'}});
  assert.equal(r.stdout,'');assert.equal(r.stderr,'');
 });
-async function state(s:RunningService):Promise<{jobs:import('../model.mts').Job[];cursor:number;active:boolean}>{
- const r=await fetch(s.url+'/state',{signal:AbortSignal.timeout(2000)});assert.equal(r.status,200);return r.json();
+async function state(s:RunningService):Promise<{jobs:Record<string,unknown>[];cursor:number;active:boolean}>{
+ const r=await fetch(s.url+'/state',{signal:AbortSignal.timeout(2000)});assert.equal(r.status,200);
+ const value=object(await r.json());assert.ok(Array.isArray(value.jobs));
+ assert.ok(typeof value.cursor==='number');assert.ok(typeof value.active==='boolean');
+ return {jobs:value.jobs.map(object),cursor:value.cursor,active:value.active};
 }
 async function post(s:RunningService,path:string,body:unknown,status=200){const r=await jsonRequest(s.url+path,body);assert.equal(r.status,status);return r;}
 async function held(s:RunningService){

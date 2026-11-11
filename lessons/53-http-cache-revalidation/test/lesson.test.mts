@@ -6,7 +6,7 @@ test('unit: corrected age includes skewed Date and transit delay', async () => {
   assert.equal(initialAge(100, 103, 102, 4), 7);
   assert.equal(initialAge(100, 103, 90, 0), 13);
 });
-import { Cache, parseDocument } from '../model.mts';
+import { Cache, parseDocument, object } from '../model.mts';
 const epoch = 1700000000;
 function reply(policy = 'public,max-age=5,must-revalidate', status = 200, version = 1, language = 'en') {
   return new Response(status === 304 ? null : JSON.stringify({language,version,text:'Hello'}), {status, headers:{etag:`"${language}-${version}"`,vary:'Accept-Language',date:new Date(epoch*1000).toUTCString(),age:'0','cache-control':policy}});
@@ -79,16 +79,16 @@ test('integration: public variants revalidate, bypass, fail closed and restart w
     try{
       const cache=await startService(new URL('../cache.mts',import.meta.url),{...teaching,ORIGIN_URL:origin.url});
       try{
-        const first=await get(cache.url+'/document');assert.equal(first.status,200);assert.equal(first.headers.get('x-cache'),'miss');assert.equal(first.headers.get('cache-control'),'public,max-age=5,must-revalidate');assert.equal((await first.json()).text,'Hello');
+        const first=await get(cache.url+'/document');assert.equal(first.status,200);assert.equal(first.headers.get('x-cache'),'miss');assert.equal(first.headers.get('cache-control'),'public,max-age=5,must-revalidate');assert.equal(object(await first.json()).text,'Hello');
         assert.equal((await get(cache.url+'/document')).headers.get('x-cache'),'hit');
-        assert.equal((await (await get(origin.url+'/teaching/state')).json()).requests,1);
-        const vi=await get(cache.url+'/document',{'accept-language':'vi'});assert.equal((await vi.json()).text,'Xin_chao');assert.equal(vi.headers.get('vary'),'Accept-Language');
+        assert.equal(object(await (await get(origin.url+'/teaching/state')).json()).requests,1);
+        const vi=await get(cache.url+'/document',{'accept-language':'vi'});assert.equal(object(await vi.json()).text,'Xin_chao');assert.equal(vi.headers.get('vary'),'Accept-Language');
         await advance(origin.url);await advance(cache.url);
-        const unchanged=await get(cache.url+'/document');assert.equal(unchanged.headers.get('x-cache'),'revalidated');assert.equal((await unchanged.json()).text,'Hello');
-        assert.equal((await (await get(origin.url+'/teaching/state')).json()).notModified,1);
+        const unchanged=await get(cache.url+'/document');assert.equal(unchanged.headers.get('x-cache'),'revalidated');assert.equal(object(await unchanged.json()).text,'Hello');
+        assert.equal(object(await (await get(origin.url+'/teaching/state')).json()).notModified,1);
         assert.equal((await jsonRequest(origin.url+'/teaching/content',{language:'en',version:2,text:'Next',policy:'public'})).status,200);
         await advance(origin.url);await advance(cache.url);
-        const changed=await get(cache.url+'/document');assert.equal(changed.headers.get('x-cache'),'miss');assert.equal((await changed.json()).version,2);
+        const changed=await get(cache.url+'/document');assert.equal(changed.headers.get('x-cache'),'miss');assert.equal(object(await changed.json()).version,2);
         await jsonRequest(origin.url+'/teaching/availability',{available:false});await advance(origin.url);await advance(cache.url);
         assert.equal((await get(cache.url+'/document')).status,502);
         await jsonRequest(origin.url+'/teaching/availability',{available:true});
@@ -112,9 +112,9 @@ test('integration: public variants revalidate, bypass, fail closed and restart w
     const restarted=await startService(new URL('../origin.mts',import.meta.url),{DB_PATH:join(directory,'origin.sqlite')});
     try{
       assert.equal((await get(restarted.url+'/teaching/state')).status,404);
-      assert.equal((await (await get(restarted.url+'/document',{'accept-language':'vi'})).json()).text,'Xin_chao');
+      assert.equal(object(await (await get(restarted.url+'/document',{'accept-language':'vi'})).json()).text,'Xin_chao');
       const cold=await startService(new URL('../cache.mts',import.meta.url),{ORIGIN_URL:restarted.url});
-      try{const response=await get(cold.url+'/document');assert.equal(response.headers.get('x-cache'),'miss');assert.equal((await response.json()).text,'Persisted');assert.equal((await jsonRequest(cold.url+'/teaching/advance',{seconds:1})).status,404);}finally{await cold.stop();}
+      try{const response=await get(cold.url+'/document');assert.equal(response.headers.get('x-cache'),'miss');assert.equal(object(await response.json()).text,'Persisted');assert.equal((await jsonRequest(cold.url+'/teaching/advance',{seconds:1})).status,404);}finally{await cold.stop();}
     }finally{await restarted.stop();}
   }finally{await rm(directory,{recursive:true,force:true});}
 });
@@ -128,13 +128,13 @@ test('integration: bounded upstream rejects invalid bodies and never follows red
         const mode=async(value:string)=>{assert.equal((await jsonRequest(source.url+'/teaching/mode',{mode:value,destination:sink.url})).status,200);};
         await mode('redirect');assert.equal((await get(cache.url+'/document')).status,502);
         // Inspect before any mode change: redirects must leave this reachable origin untouched.
-        assert.equal((await (await get(sink.url+'/teaching/state')).json()).requests,0);
+        assert.equal(object(await (await get(sink.url+'/teaching/state')).json()).requests,0);
         for(const value of ['oversize','malformed','slow','bad-age','bad-date','bad-vary','bad-policy','bad-etag','wrong-language','unsolicited']){
-          const before=await (await get(source.url+'/teaching/state')).json();
+          const before=object(await (await get(source.url+'/teaching/state')).json());assert.ok(typeof before.requests==='number');
           await mode(value);assert.equal((await get(cache.url+'/document')).status,502,value);assert.deepEqual(await (await get(cache.url+'/state')).json(),[]);
-          assert.equal((await (await get(source.url+'/teaching/state')).json()).requests,before.requests+1);
+          assert.equal(object(await (await get(source.url+'/teaching/state')).json()).requests,before.requests+1);
         }
-        await mode('escaped');const accepted=await get(cache.url+'/document');assert.equal(accepted.status,200);assert.equal((await accepted.json()).text,'A'.repeat(32));
+        await mode('escaped');const accepted=await get(cache.url+'/document');assert.equal(accepted.status,200);assert.equal(object(await accepted.json()).text,'A'.repeat(32));
       }finally{await cache.stop();}
     }finally{await source.stop();}
   }finally{await sink.stop();}

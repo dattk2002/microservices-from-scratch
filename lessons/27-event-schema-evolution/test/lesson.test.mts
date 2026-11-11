@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { upcast } from '../model.mts';
+import { object, upcast } from '../model.mts';
 const v1 = { id: 'sale_a', position: 1, revision: 1, payload: { orderId: 'order_a', resourceVersion: 7, totalCents: 150 } };
 const v2 = { id: 'sale_b', position: 2, revision: 2, payload: { orderId: 'order_b', resourceVersion: 3, amount: { amountMinor: 150, currency: 'USD' } } };
 test('unit: both revisions converge deterministically without mutating input', () => {
@@ -78,7 +78,7 @@ test('integration: mixed history, legacy barrier, restart upgrade, dedup and con
   assert.deepEqual(await get(current, '/state'), { checkpoint: 2, totalMinor: 300, count: 2 });
   assert.deepEqual(await (await jsonRequest(current.url + '/teaching/deliver', v1)).json(), { applied: false });
   const conflict = await jsonRequest(current.url + '/teaching/deliver', { ...v1, payload: { ...v1.payload, totalCents: 151 } });
-  assert.equal(conflict.status, 422); assert.equal((await conflict.json()).error.code, 'identity_conflict');
+  assert.equal(conflict.status, 422); assert.equal(object(object(await conflict.json()).error).code, 'identity_conflict');
   assert.equal((await jsonRequest(current.url + '/sync', {})).status, 200);
   assert.deepEqual(await get(current, '/state'), { checkpoint: 2, totalMinor: 300, count: 2 });
   assert.deepEqual(await get(owner, '/events'), before);
@@ -93,7 +93,7 @@ for (const kind of ['unknown', 'malformed']) test('integration: valid envelopes 
   const consumer = await startService(new URL('../consumer.mts', import.meta.url), { DB_PATH: join(dir, 'c.db'), OWNER_URL: owner.url }); services.push(consumer);
   for (let i = 0; i < 2; i++) {
    const response = await jsonRequest(consumer.url + '/sync', {}); assert.equal(response.status, 422);
-   assert.equal((await response.json()).error.code, kind === 'unknown' ? 'unsupported_revision' : 'integer');
+   assert.equal(object(object(await response.json()).error).code, kind === 'unknown' ? 'unsupported_revision' : 'integer');
    assert.deepEqual(await get(consumer, '/state'), { checkpoint: 1, totalMinor: 150, count: 1 });
   }
  } finally { for (const s of services.reverse()) await s.stop(); await rm(dir, { recursive: true, force: true }); }
