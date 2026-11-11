@@ -1,0 +1,1 @@
+{"id":"52-relationship-authorization","title":"Phân quyền theo quan hệ, nhóm lồng nhau và revision của policy","entrypoints":["policy.mts","documents.mts"]}
