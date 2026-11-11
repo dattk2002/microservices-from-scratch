@@ -1,0 +1,1 @@
+{"id":"53-http-cache-revalidation","title":"HTTP cache, ETag revalidation, Age và tách biến thể bằng Vary","entrypoints":["origin.mts","cache.mts"]}
