@@ -61,18 +61,18 @@ class CourseTests(unittest.TestCase):
             (self.root / 'curriculum.json').write_text(json.dumps(entries))
             with self.assertRaises(ValueError): next_lesson(self.root)
 
-    def test_fifty_five_lesson_curriculum_is_finite_and_validates_its_tail(self):
-        entries = [dict(self.lesson, id=f'{number:02d}-lesson') for number in range(1, 56)]
+    def test_sixty_lesson_curriculum_is_finite_and_validates_its_tail(self):
+        entries = [dict(self.lesson, id=f'{number:02d}-lesson') for number in range(1, 61)]
         (self.root / 'curriculum.json').write_text(json.dumps(entries))
         try:
             selected = next_lesson(self.root)
         except ValueError as error:
-            self.fail(f'Authorized finite 55-lesson curriculum was rejected: {error}')
+            self.fail(f'Authorized finite 60-lesson curriculum was rejected: {error}')
         self.assertEqual(selected, entries[0])
         invalid_tail = [*entries[:-1], dict(entries[-1], requirements=[])]
         (self.root / 'curriculum.json').write_text(json.dumps(invalid_tail))
         with self.assertRaises(ValueError): next_lesson(self.root)
-        (self.root / 'curriculum.json').write_text(json.dumps([*entries, dict(self.lesson, id='56-lesson')]))
+        (self.root / 'curriculum.json').write_text(json.dumps([*entries, dict(self.lesson, id='61-lesson')]))
         with self.assertRaisesRegex(ValueError, 'Invalid finite curriculum'): next_lesson(self.root)
 
     def test_partial_later_lesson_blocks_even_when_first_is_missing(self):
