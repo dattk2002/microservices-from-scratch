@@ -81,6 +81,25 @@ class CourseTests(unittest.TestCase):
         (self.root / 'lessons' / later['id']).mkdir(parents=True)
         with self.assertRaises(ValueError): next_lesson(self.root)
 
+    def test_timeout_reports_bounded_output_for_diagnosis(self):
+        source = "import sys,time; print('diagnostic-marker-' + 'x'*3000, flush=True); print('last-completed-boundary', flush=True); time.sleep(5)"
+        with self.assertRaises(RuntimeError) as caught:
+            daily.command([sys.executable, '-c', source], timeout=0.3)
+        message = str(caught.exception)
+        self.assertIn('last-completed-boundary', message)
+        self.assertNotIn('diagnostic-marker-', message)
+        self.assertLess(len(message), 2200)
+
+    def test_logged_timeout_references_log_without_repeating_output(self):
+        source = "import time; print('fixture-output-marker', flush=True); time.sleep(5)"
+        with tempfile.NamedTemporaryFile(mode='w+') as log:
+            with self.assertRaises(RuntimeError) as caught:
+                daily.command([sys.executable, '-c', source], timeout=0.3, log=log)
+            self.assertIn('inspect ' + log.name, str(caught.exception))
+            self.assertNotIn('fixture-output-marker', str(caught.exception))
+            log.seek(0)
+            self.assertIn('fixture-output-marker', log.read())
+
     def test_command_caps_both_capture_and_log_while_running(self):
         script = "import os; os.write(1, b'x' * 100000)"
         with patch.object(daily, 'MAX_OUTPUT', 4096, create=True):

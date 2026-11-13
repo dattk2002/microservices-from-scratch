@@ -41,9 +41,9 @@
 **Interfaces:** `next_lesson(root)` accepts65 entries, validates the entire tail and rejects66 entries. The first60 entries are byte-equivalent JSON values.
 
 - [ ] Write guard assertion for65 first; run focused unittest and observe `Authorized finite65-lesson curriculum was rejected` under old60 ceiling.
-- [ ] Change only finite controller ceiling60→65 and corresponding regression; append exact five contracts and primary references, update counts/request documentation.
-- [ ] Run focused GREEN (valid65, malformed65th, rejected66), native `npm run check`, isolated `make test`, `git diff --check`. Expected: all tests pass without increased resources/timeouts.
-- [ ] Obtain independent metadata/spec review. Trusted operator commits/pushes coherent metadata PR, waits exact-head CI, squashes with credit, verifies merge then atomically installs only the reviewed60→65 controller change.
+- [ ] Change finite controller ceiling60→65 and corresponding regression; retain the last2000 captured characters in timeout diagnostics (or reference an existing log) without changing timeout/cleanup/output limits; append exact five contracts and primary references, update counts/request documentation.
+- [ ] Run focused GREEN (valid65, malformed65th, rejected66), native `npm run check`, isolated `make test`, `git diff --check`. Expected: all tests pass without increased resources/timeouts. Add actual RED→GREEN timeout-tail assertion and logged-output path/privacy regression before diagnostic implementation.
+- [ ] Obtain independent metadata/spec review. Trusted operator commits/pushes coherent metadata PR, waits exact-head CI, squashes with credit, verifies merge then atomically installs only the exact reviewed finite-cap and bounded timeout-diagnostic changes.
 
 ### Task2: Escrow bounded counter
 

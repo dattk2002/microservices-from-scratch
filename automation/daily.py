@@ -41,7 +41,8 @@ def command(args, cwd=None, timeout=120, env=None, log=None):
             os.set_blocking(process.stdout.fileno(), False)
             while True:
                 if time.monotonic() >= deadline:
-                    raise RuntimeError(f"Command timed out; inspect state before retry: {args[0]}")
+                    detail = f"inspect {log.name}" if log else captured.decode('utf-8', errors='replace')[-2000:]
+                    raise RuntimeError(f"Command timed out; inspect state before retry: {args[0]} {detail}")
                 ready = selector.select(min(0.1, max(0, deadline - time.monotonic())))
                 if ready:
                     chunk = os.read(process.stdout.fileno(), 65536)
