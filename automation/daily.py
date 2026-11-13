@@ -221,7 +221,8 @@ def container_args(root, name, token):
             '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
             '--memory', '512m', '--memory-swap', '512m', '--cpus', '2', '--pids-limit', '128',
             '--log-driver', 'none', '--tmpfs', '/tmp:rw,noexec,nosuid,size=128m,mode=1777',
-            '--env', 'HOME=/tmp', '--env', 'CI=true', '--workdir', '/workspace',
+            '--env', 'HOME=/tmp', '--env', 'CI=true',
+            '--env', 'NODE_COMPILE_CACHE=/tmp/node-compile-cache', '--workdir', '/workspace',
             '--volume', f'{root.resolve()}:/workspace:ro', IMAGE, 'npm', 'run', 'check']
 
 

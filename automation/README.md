@@ -40,7 +40,9 @@ tài khoản; không cần đặt API key trong repo/crontab.
    TDD unit test không dùng socket; log được giới hạn ngay trong lúc chạy.
 5. Controller chạy tsc + toàn bộ HTTP integration trong Docker
    non-root, source/root chỉ đọc, network none (loopback riêng), không home,
-   token hoặc Docker socket, có giới hạn memory/CPU/PID. Container theo UUID được
+   token hoặc Docker socket, có giới hạn memory/CPU/PID. Node compile cache chỉ nằm
+   trong tmpfs `/tmp` riêng của container và được truyền rõ ràng cho child service;
+   cache bị hủy cùng container, không tái sử dụng qua lượt chạy. Container theo UUID được
    dọn trong finally nếu Docker CLI timeout; không dọn container của ứng dụng khác.
 6. Codex read-only review thực tế file mới. Chưa được duyệt thì không publish.
 7. Ghi state bền trước push/tạo PR/merge, chờ CI đúng head và base chưa đổi,

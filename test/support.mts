@@ -9,7 +9,7 @@ export type RunningService = { url: string; child: ChildProcess; stop: () => Pro
 export async function startService(entry: URL, env: Record<string, string> = {}): Promise<RunningService> {
   // Concurrent test files share a small PID budget; bound each fixture's background pools.
   const child = spawn(process.execPath, ['--v8-pool-size=1', fileURLToPath(entry)], {
-    env: { PATH: process.env.PATH ?? '', HOST: '127.0.0.1', PORT: '0', ...env, UV_THREADPOOL_SIZE: '1' },
+    env: { PATH: process.env.PATH ?? '', ...(process.env.NODE_COMPILE_CACHE === undefined ? {} : { NODE_COMPILE_CACHE: process.env.NODE_COMPILE_CACHE }), HOST: '127.0.0.1', PORT: '0', ...env, UV_THREADPOOL_SIZE: '1' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let stderr = '';
