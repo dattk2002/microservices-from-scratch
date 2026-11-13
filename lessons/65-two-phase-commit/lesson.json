@@ -1,0 +1,1 @@
+{"id":"65-two-phase-commit","title":"Two-phase commit, quyết định lưu bền và participant bị treo sau prepare","entrypoints":["participant.mts","coordinator.mts"]}
