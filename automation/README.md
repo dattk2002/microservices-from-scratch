@@ -2,9 +2,9 @@
 
 Chủ repo đã cho phép lịch09:15 Asia/Ho_Chi_Minh làm một bài tiếp theo trong
 `curriculum.json`, có PR và squash merge sau test/review/CI đạt. Lộ trình hữu
-hạn60 bài (bổ sung bài13–15 ngày2026-11-02 và bài16–20 theo yêu cầu chạy thêm
+hạn65 bài (bổ sung bài13–15 ngày2026-11-02 và bài16–20 theo yêu cầu chạy thêm
 năm bài ngày2026-11-03 và bài21–25 theo yêu cầu đã chốt ngày2026-11-04
-của chủ repo; bài26–30 theo yêu cầu chạy năm bài ngày2026-11-05 và bài31–35 theo yêu cầu chạy năm bài ngày2026-11-06 và bài36–40 theo yêu cầu chạy tiếp năm bài ngày2026-11-08 và bài41–45 theo yêu cầu chạy năm bài ngày2026-11-09 và bài46–50 theo yêu cầu chạy năm bài ngày2026-11-10 và bài51–55 theo yêu cầu chạy tiếp năm bài ngày2026-11-11 và bài56–60 theo yêu cầu chạy năm bài ngày2026-11-12);
+của chủ repo; bài26–30 theo yêu cầu chạy năm bài ngày2026-11-05 và bài31–35 theo yêu cầu chạy năm bài ngày2026-11-06 và bài36–40 theo yêu cầu chạy tiếp năm bài ngày2026-11-08 và bài41–45 theo yêu cầu chạy năm bài ngày2026-11-09 và bài46–50 theo yêu cầu chạy năm bài ngày2026-11-10 và bài51–55 theo yêu cầu chạy tiếp năm bài ngày2026-11-11 và bài56–60 theo yêu cầu chạy năm bài ngày2026-11-12 và bài61–65 theo yêu cầu chạy năm bài ngày2026-11-13);
 không tự gia hạn,
 không tạo bài để đủ quota. Không sửa repo thuật toán
 hoặc cron09:00. Máy tắt vào giờ chạy thì bỏ lỡ lượt đó, không chạy bù hàng loạt.
