@@ -41,7 +41,8 @@ def command(args, cwd=None, timeout=120, env=None, log=None):
             os.set_blocking(process.stdout.fileno(), False)
             while True:
                 if time.monotonic() >= deadline:
-                    raise RuntimeError(f"Command timed out; inspect state before retry: {args[0]}")
+                    detail = f"inspect {log.name}" if log else captured.decode('utf-8', errors='replace')[-2000:]
+                    raise RuntimeError(f"Command timed out; inspect state before retry: {args[0]} {detail}")
                 ready = selector.select(min(0.1, max(0, deadline - time.monotonic())))
                 if ready:
                     chunk = os.read(process.stdout.fileno(), 65536)
@@ -177,7 +178,7 @@ def lesson_files(root, identifier):
 
 def next_lesson(root):
     lessons = json.loads((root / 'curriculum.json').read_text())
-    if not isinstance(lessons, list) or not 1 <= len(lessons) <= 60:
+    if not isinstance(lessons, list) or not 1 <= len(lessons) <= 65:
         raise ValueError('Invalid finite curriculum')
     seen = set()
     for lesson in lessons:
@@ -220,7 +221,8 @@ def container_args(root, name, token):
             '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
             '--memory', '512m', '--memory-swap', '512m', '--cpus', '2', '--pids-limit', '128',
             '--log-driver', 'none', '--tmpfs', '/tmp:rw,noexec,nosuid,size=128m,mode=1777',
-            '--env', 'HOME=/tmp', '--env', 'CI=true', '--workdir', '/workspace',
+            '--env', 'HOME=/tmp', '--env', 'CI=true',
+            '--env', 'NODE_COMPILE_CACHE=/tmp/node-compile-cache', '--workdir', '/workspace',
             '--volume', f'{root.resolve()}:/workspace:ro', IMAGE, 'npm', 'run', 'check']
 
 

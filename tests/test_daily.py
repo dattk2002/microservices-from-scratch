@@ -61,18 +61,18 @@ class CourseTests(unittest.TestCase):
             (self.root / 'curriculum.json').write_text(json.dumps(entries))
             with self.assertRaises(ValueError): next_lesson(self.root)
 
-    def test_sixty_lesson_curriculum_is_finite_and_validates_its_tail(self):
-        entries = [dict(self.lesson, id=f'{number:02d}-lesson') for number in range(1, 61)]
+    def test_sixty_five_lesson_curriculum_is_finite_and_validates_its_tail(self):
+        entries = [dict(self.lesson, id=f'{number:02d}-lesson') for number in range(1, 66)]
         (self.root / 'curriculum.json').write_text(json.dumps(entries))
         try:
             selected = next_lesson(self.root)
         except ValueError as error:
-            self.fail(f'Authorized finite 60-lesson curriculum was rejected: {error}')
+            self.fail(f'Authorized finite 65-lesson curriculum was rejected: {error}')
         self.assertEqual(selected, entries[0])
         invalid_tail = [*entries[:-1], dict(entries[-1], requirements=[])]
         (self.root / 'curriculum.json').write_text(json.dumps(invalid_tail))
         with self.assertRaises(ValueError): next_lesson(self.root)
-        (self.root / 'curriculum.json').write_text(json.dumps([*entries, dict(self.lesson, id='61-lesson')]))
+        (self.root / 'curriculum.json').write_text(json.dumps([*entries, dict(self.lesson, id='66-lesson')]))
         with self.assertRaisesRegex(ValueError, 'Invalid finite curriculum'): next_lesson(self.root)
 
     def test_partial_later_lesson_blocks_even_when_first_is_missing(self):
@@ -80,6 +80,25 @@ class CourseTests(unittest.TestCase):
         (self.root / 'curriculum.json').write_text(json.dumps([self.lesson, later]))
         (self.root / 'lessons' / later['id']).mkdir(parents=True)
         with self.assertRaises(ValueError): next_lesson(self.root)
+
+    def test_timeout_reports_bounded_output_for_diagnosis(self):
+        source = "import sys,time; print('diagnostic-marker-' + 'x'*3000, flush=True); print('last-completed-boundary', flush=True); time.sleep(5)"
+        with self.assertRaises(RuntimeError) as caught:
+            daily.command([sys.executable, '-c', source], timeout=0.3)
+        message = str(caught.exception)
+        self.assertIn('last-completed-boundary', message)
+        self.assertNotIn('diagnostic-marker-', message)
+        self.assertLess(len(message), 2200)
+
+    def test_logged_timeout_references_log_without_repeating_output(self):
+        source = "import time; print('fixture-output-marker', flush=True); time.sleep(5)"
+        with tempfile.NamedTemporaryFile(mode='w+') as log:
+            with self.assertRaises(RuntimeError) as caught:
+                daily.command([sys.executable, '-c', source], timeout=0.3, log=log)
+            self.assertIn('inspect ' + log.name, str(caught.exception))
+            self.assertNotIn('fixture-output-marker', str(caught.exception))
+            log.seek(0)
+            self.assertIn('fixture-output-marker', log.read())
 
     def test_command_caps_both_capture_and_log_while_running(self):
         script = "import os; os.write(1, b'x' * 100000)"
