@@ -1,0 +1,1 @@
+{"id":"66-single-decree-paxos","title":"Paxos cho một quyết định, durable promise và tiếp nhận giá trị đã được chấp nhận","entrypoints":["acceptor.mts","proposer.mts"]}
