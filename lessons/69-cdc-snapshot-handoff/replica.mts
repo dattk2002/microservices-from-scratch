@@ -1,4 +1,3 @@
-import { DatabaseSync } from 'node:sqlite';
 import { serve, json } from '../../lib/http.mts';
 import { fail, fields } from './protocol.mts';
 import { readBody, settings } from './runtime.mts';
@@ -7,6 +6,7 @@ import { Replica } from './engine.mts';
 
 export async function main() {
  const config=settings('replica');if(!config.origin)throw new Error('SOURCE_ORIGIN required');
+ const {DatabaseSync}=await import('node:sqlite');
  const db=new DatabaseSync(config.path);
  try {
   const store=new ReplicaStore(db,config.origin);const replica=new Replica(store);let busy=false;

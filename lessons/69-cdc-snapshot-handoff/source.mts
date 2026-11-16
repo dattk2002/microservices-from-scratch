@@ -1,11 +1,12 @@
-import { DatabaseSync } from 'node:sqlite';
 import { serve, json } from '../../lib/http.mts';
 import { fields, fail } from './protocol.mts';
 import { readBody, settings } from './runtime.mts';
 import { SourceStore } from './store.mts';
 
 export async function main() {
- const config=settings('source');const db=new DatabaseSync(config.path);
+ const config=settings('source');
+ const {DatabaseSync}=await import('node:sqlite');
+ const db=new DatabaseSync(config.path);
  try {
   const store=new SourceStore(db);
   const server=await serve('cdc-source',3069,async(req,res)=>{
