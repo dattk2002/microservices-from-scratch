@@ -1,0 +1,1 @@
+{"id":"70-event-time-interval-join","title":"Join hai luồng theo event-time, watermark và đóng kết quả có giới hạn","entrypoints":["join.mts","ingress.mts"]}
