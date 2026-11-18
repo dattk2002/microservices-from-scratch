@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { flushCompileCache } from 'node:module';
 import { createInterface } from 'node:readline';
 import { once } from 'node:events';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +8,8 @@ import type { ChildProcess } from 'node:child_process';
 export type RunningService = { url: string; child: ChildProcess; stop: () => Promise<void> };
 
 export async function startService(entry: URL, env: Record<string, string> = {}): Promise<RunningService> {
+  // Publish this live worker's compiled modules before children try to reuse them.
+  if (process.env.NODE_COMPILE_CACHE !== undefined) flushCompileCache();
   // Concurrent test files share a small PID budget; bound each fixture's background pools.
   const child = spawn(process.execPath, ['--v8-pool-size=1', fileURLToPath(entry)], {
     env: { PATH: process.env.PATH ?? '', ...(process.env.NODE_COMPILE_CACHE === undefined ? {} : { NODE_COMPILE_CACHE: process.env.NODE_COMPILE_CACHE }), HOST: '127.0.0.1', PORT: '0', ...env, UV_THREADPOOL_SIZE: '1' },
