@@ -1,0 +1,5 @@
+{
+  "id": "76-sharded-keyset-pagination",
+  "title": "Phân trang keyset qua nhiều shard và cursor gắn với vector snapshot",
+  "entrypoints": ["shard.mts", "query.mts"]
+}
