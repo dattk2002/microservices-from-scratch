@@ -1,0 +1,5 @@
+{
+  "id": "77-misra-gries-heavy-hitters",
+  "title": "Heavy hitters bằng Misra–Gries, sai số có chặn và hợp nhất summary",
+  "entrypoints": ["stream.mts", "query.mts"]
+}
