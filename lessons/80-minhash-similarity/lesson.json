@@ -1,0 +1,5 @@
+{
+  "id": "80-minhash-similarity",
+  "title": "MinHash, ước lượng Jaccard và chữ ký hợp nhất theo từng vị trí",
+  "entrypoints": ["signature.mts", "compare.mts"]
+}
