@@ -39,16 +39,21 @@ console.log(JSON.stringify(diagnostics.map(d => ({code:d.code, message:ts.flatte
         self.assertTrue(any('document' in d['message'] for d in diagnostics))
         self.assertTrue(any('window' in d['message'] for d in diagnostics))
 
-    def test_service_children_inherit_explicit_compile_cache(self):
+    def test_service_children_receive_live_parent_compile_cache(self):
         import os
         import tempfile
         with tempfile.TemporaryDirectory(prefix='micro-node-cache-') as folder:
             directory = Path(folder)
-            fixture = directory / 'fixture.mts'
+            fixture = directory / 'fixture.mjs'
             cache = directory / 'cache'
             fixture.write_text("""import { getCompileCacheDir } from 'node:module';
+import { readdirSync } from 'node:fs';
 const actual = getCompileCacheDir();
 if (!actual?.startsWith(process.env.EXPECTED_CACHE + '/')) throw new Error('Explicit compile cache was dropped');
+// The parent and this JavaScript child are still alive; no process-exit flush can satisfy this.
+if (!readdirSync(actual, {withFileTypes:true}).some(entry => entry.isFile())) {
+  throw new Error('Parent compile cache was not available before service startup');
+}
 console.log(JSON.stringify({port:12345}));
 setInterval(() => {}, 1000);
 """)

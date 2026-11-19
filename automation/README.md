@@ -44,6 +44,9 @@ tài khoản; không cần đặt API key trong repo/crontab.
    trong tmpfs `/tmp` riêng của container và được truyền rõ ràng cho child service;
    cache bị hủy cùng container, không tái sử dụng qua lượt chạy. Container theo UUID được
    dọn trong finally nếu Docker CLI timeout; không dọn container của ứng dụng khác.
+   Ngân sách mặc định cho toàn bộ tsc + test là 240 giây; deadline riêng của
+   từng request/test và giới hạn memory/CPU/PID giữ nguyên. Hết ngân sách vẫn
+   dừng cả nhóm tiến trình và dọn đúng container thuộc lượt chạy đó.
 6. Codex read-only review thực tế file mới. Chưa được duyệt thì không publish.
 7. Ghi state bền trước push/tạo PR/merge, chờ CI đúng head và base chưa đổi,
    squash giữ trailer `Co-authored-by: OpenAI Codex <codex@openai.com>`.

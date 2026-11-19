@@ -1,0 +1,5 @@
+{
+  "id": "78-logarithmic-quantiles",
+  "title": "Quantile qua nhiều shard bằng histogram logarithmic có sai số tương đối",
+  "entrypoints": ["histogram.mts", "query.mts"]
+}
