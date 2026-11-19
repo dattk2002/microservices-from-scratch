@@ -178,7 +178,7 @@ def lesson_files(root, identifier):
 
 def next_lesson(root):
     lessons = json.loads((root / 'curriculum.json').read_text())
-    if not isinstance(lessons, list) or not 1 <= len(lessons) <= 80:
+    if not isinstance(lessons, list) or not 1 <= len(lessons) <= 85:
         raise ValueError('Invalid finite curriculum')
     seen = set()
     for lesson in lessons:
