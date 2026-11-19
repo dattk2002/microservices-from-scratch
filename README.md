@@ -21,7 +21,7 @@ TypeScript được **kiểm tra kiểu bằng tsc**, rồi Node chạy `.mts` b
 ## Bài học
 
 - [01 — Ranh giới dịch vụ và HTTP](lessons/01-service-boundaries-http/README.md)
-- [Lộ trình hữu hạn80 bài](curriculum.json): hợp đồng API, dữ liệu riêng,
+- [Lộ trình hữu hạn85 bài](curriculum.json): hợp đồng API, dữ liệu riêng,
   deadline, idempotency, retry, circuit breaker, correlation log, gateway,
   graceful shutdown, outbox, saga, bulkhead, rate limiting, CQRS, cache-aside,
   job bất đồng bộ, xác thực dịch vụ, metrics, chuyển đổi Strangler Fig, discovery,
@@ -60,3 +60,5 @@ Lượt chạy dùng hạn mức Codex hiện có; không lưu token trong repo 
 Lịch mới độc lập với repo thuật toán lúc09:00; không chạy bù hàng loạt khi máy tắt.
 
 Xem [vận hành, dừng lịch và khôi phục](automation/README.md).
+
+Ngày 2026-11-19, chủ repo yêu cầu thêm đúng năm bài 81–85 (SSE replay, HTTP Range, gzip có giới hạn, rendezvous hashing, stale-while-revalidate) và hoàn tất các bài còn mở. Lộ trình hữu hạn 85 bài, không tự gia hạn. Tổng ngân sách tsc + test Docker được chủ repo duyệt tăng lên 240 giây; deadline từng request/test và giới hạn CPU/RAM/PID/cô lập giữ nguyên.
