@@ -1,0 +1,5 @@
+{
+  "id": "79-mergeable-variance",
+  "title": "Welford và hợp nhất mean, variance khi các shard có kích thước khác nhau",
+  "entrypoints": ["moments.mts", "query.mts"]
+}
