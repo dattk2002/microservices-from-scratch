@@ -1,0 +1,5 @@
+{
+  "id": "83-bounded-gzip-ingress",
+  "title": "Giới hạn dữ liệu nén và giải nén gzip tại biên dịch vụ",
+  "entrypoints": ["ingress.mts", "sink.mts"]
+}
