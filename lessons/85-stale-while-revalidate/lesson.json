@@ -1,0 +1,5 @@
+{
+  "id": "85-stale-while-revalidate",
+  "title": "Cache stale-while-revalidate, single-flight và giới hạn độ cũ",
+  "entrypoints": ["origin.mts", "cache.mts"]
+}
