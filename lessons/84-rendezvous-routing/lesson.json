@@ -1,0 +1,5 @@
+{
+  "id": "84-rendezvous-routing",
+  "title": "Rendezvous hashing, thay đổi membership và định tuyến ổn định",
+  "entrypoints": ["router.mts", "backend.mts"]
+}
