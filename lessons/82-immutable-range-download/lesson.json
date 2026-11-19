@@ -1,0 +1,5 @@
+{
+  "id": "82-immutable-range-download",
+  "title": "Tải tiếp đối tượng bất biến bằng HTTP Range và If-Range",
+  "entrypoints": ["object.mts", "downloader.mts"]
+}
