@@ -1,0 +1,5 @@
+{
+  "id": "88-revision-long-poll",
+  "title": "Long polling theo phiên bản tài liệu",
+  "entrypoints": ["origin.mts", "observer.mts"]
+}
