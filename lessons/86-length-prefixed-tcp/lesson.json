@@ -1,0 +1,5 @@
+{
+  "id": "86-length-prefixed-tcp",
+  "title": "Đóng khung thông điệp TCP bằng độ dài",
+  "entrypoints": ["worker.mts", "gateway.mts"]
+}
