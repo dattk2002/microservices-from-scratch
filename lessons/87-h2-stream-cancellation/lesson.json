@@ -1,0 +1,5 @@
+{
+  "id": "87-h2-stream-cancellation",
+  "title": "Ghép kênh HTTP/2 và hủy riêng từng stream",
+  "entrypoints": ["worker.mts", "gateway.mts"]
+}
