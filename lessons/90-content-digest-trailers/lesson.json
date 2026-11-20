@@ -1,0 +1,5 @@
+{
+  "id": "90-content-digest-trailers",
+  "title": "Xác minh Content-Digest trong HTTP trailer",
+  "entrypoints": ["producer.mts", "consumer.mts"]
+}
