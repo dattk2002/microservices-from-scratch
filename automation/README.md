@@ -53,6 +53,15 @@ tài khoản; không cần đặt API key trong repo/crontab.
 8. Xác minh PR thật sự MERGED rồi ghi thành công. Bất kỳ trạng thái dở/không
    chắc chắn nào cũng được giữ lại để kiểm tra, không tự phát lại thao tác ghi.
 
+## Kiểm tra kiểu TypeScript
+
+`npm run typecheck` đọc toàn bộ chương trình theo `tsconfig.json`, kể cả thư viện kiểu
+và mô-đun được import. Sau bước kiểm tra cấu hình, cú pháp và khai báo toàn cục,
+`automation/typecheck.mjs` chạy tuần tự từng tiến trình Node với giới hạn heap 320 MiB.
+Mỗi tiến trình nạp lại cùng chương trình, đối chiếu danh sách tệp rồi kiểm tra kiểu
+cho tối đa 200 tệp. Cách này giữ được khai báo toàn cục giữa các bài và giải phóng
+bộ nhớ của trình kiểm tra kiểu sau mỗi nhóm.
+
 ## Kiểm tra và dừng
 
 ```sh
