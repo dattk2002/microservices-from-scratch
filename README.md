@@ -66,3 +66,5 @@ Ngày 2026-11-19, chủ repo yêu cầu thêm đúng năm bài 81–85 (SSE repl
 Ngày 2026-11-20, chủ repo yêu cầu thêm đúng năm bài 86–90: TCP framing, HTTP/2 multiplexing, revision long polling, JSON Merge Patch và Content-Digest trong HTTP trailers. Lộ trình hữu hạn 90 bài, không tự gia hạn. Ngân sách Docker 240 giây và các giới hạn request/test, CPU/RAM/PID/cô lập giữ nguyên.
 
 Ngày 2026-11-24, chủ repo xác nhận thêm đúng năm bài 91–95: thương lượng nội dung bằng Accept, Expect: 100-continue, HTTP qua Unix socket, redirect có allowlist và deadline toàn chuỗi, và HTTP/2 GOAWAY. Lộ trình hữu hạn 95 bài, không tự gia hạn. Giữ nguyên ngân sách Docker 240 giây và các giới hạn request/test, CPU/RAM/PID/cô lập.
+
+Ngày 2026-11-25, kiểm tra CI của bài 91 chạm ngân sách toàn bộ 240 giây khi còn chạy bài cũ. Ngân sách tsc + test Docker tăng lên 360 giây để kiểm tra đủ lộ trình 95 bài; mức song song vẫn là 2, deadline từng request/test và giới hạn CPU/RAM/PID/cô lập giữ nguyên.

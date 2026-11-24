@@ -218,6 +218,20 @@ print('PERMISSIONS_OK')
         with patch.object(daily.os, 'geteuid', return_value=0), self.assertRaises(ValueError):
             daily.container_args(self.root, 'test', 'token')
 
+    def test_isolated_runner_default_budget_and_explicit_override(self):
+        for override, expected in [(None, 360), (7, 7)]:
+            with self.subTest(override=override), \
+                    patch.object(daily, 'command', return_value='CHECK_OK') as command, \
+                    patch.object(daily, 'container_args', return_value=['docker', 'run', 'fixture']), \
+                    patch.object(daily.subprocess, 'run', return_value=subprocess.CompletedProcess(
+                        [], 1, stdout='', stderr='No such object')):
+                result = (daily.run_isolated_tests(self.root) if override is None
+                          else daily.run_isolated_tests(self.root, timeout=override))
+                self.assertEqual(result, 'CHECK_OK')
+                self.assertEqual(command.call_args_list[-1].args,
+                                 (['docker', 'run', 'fixture'], self.root))
+                self.assertEqual(command.call_args_list[-1].kwargs, {'timeout': expected})
+
     @unittest.skipUnless(shutil.which('docker'), 'Docker integration prerequisite')
     def test_isolated_container_has_only_private_loopback_and_readonly_source(self):
         self.root.chmod(0o755)
