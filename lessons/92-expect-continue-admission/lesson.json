@@ -1,0 +1,5 @@
+{
+  "id": "92-expect-continue-admission",
+  "title": "Từ chối upload sớm với Expect: 100-continue",
+  "entrypoints": ["receiver.mts", "uploader.mts"]
+}
