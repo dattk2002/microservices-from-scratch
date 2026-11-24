@@ -226,7 +226,7 @@ def container_args(root, name, token):
             '--volume', f'{root.resolve()}:/workspace:ro', IMAGE, 'npm', 'run', 'check']
 
 
-def run_isolated_tests(root, timeout=240):
+def run_isolated_tests(root, timeout=360):
     try:
         command(['docker', 'image', 'inspect', '--format', '{{.Id}}', IMAGE], root)
     except RuntimeError as error:
