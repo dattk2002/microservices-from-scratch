@@ -44,7 +44,7 @@ tài khoản; không cần đặt API key trong repo/crontab.
    trong tmpfs `/tmp` riêng của container và được truyền rõ ràng cho child service;
    cache bị hủy cùng container, không tái sử dụng qua lượt chạy. Container theo UUID được
    dọn trong finally nếu Docker CLI timeout; không dọn container của ứng dụng khác.
-   Ngân sách mặc định cho toàn bộ tsc + test là 240 giây; deadline riêng của
+   Ngân sách mặc định cho toàn bộ tsc + test là 360 giây; deadline riêng của
    từng request/test và giới hạn memory/CPU/PID giữ nguyên. Hết ngân sách vẫn
    dừng cả nhóm tiến trình và dọn đúng container thuộc lượt chạy đó.
 6. Codex read-only review thực tế file mới. Chưa được duyệt thì không publish.

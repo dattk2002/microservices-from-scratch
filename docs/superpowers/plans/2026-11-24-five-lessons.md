@@ -8,7 +8,7 @@
 **Spec:** New curriculum entries91–95 in curriculum.json are binding exact contracts. Topics are coordinator choices under the user's explicit authorization for five new lessons.
 
 ## Global Constraints
-Preserve first90entries, all existing lessons, user playground changes, dependencies, container limits and240s whole-check budget. Workers may ONLY add README.md,lesson.json,.mts inside the selected NEW lesson; maximum20files,100kB each,250kB total. No worker network/listeners/credentials/Docker/Git writes/agents/questions. Author integration tests, execute only units/typecheck. Outer controller validates exact file hashes before/after tests/review/publication. No uncertain external write replay.
+Preserve first90entries, all existing lessons, user playground changes, dependencies, container limits. Workers may ONLY add README.md,lesson.json,.mts inside the selected NEW lesson; maximum20files,100kB each,250kB total. No worker network/listeners/credentials/Docker/Git writes/agents/questions. Author integration tests, execute only units/typecheck. Outer controller validates exact file hashes before/after tests/review/publication. No uncertain external write replay.
 
 ## Review Focus
 - Accept specificity overrides wildcard quality; q=0 exclusions survive wildcard fallback.
@@ -75,3 +75,7 @@ Interfaces: consumes Node built-ins and existing lib/test helpers only; produces
 - [ ] Fast-forward user checkout after verifying local change overlap; preserve every user-owned file hash; full checks including user playground. Keep evidence and report exact PR links/checks/limits.
 
 Execution decision: user approved the established controller workflow; no extra design/plan approval needed. Isolated clone avoids user workspace writes. Parallel author work has no shared state. Independent restricted reviewers cannot publish. Publication sequential, one lesson per PR. Stop on uncertain write or partial work; inspect resulting state before any recovery.
+
+## Whole-check budget adjustment, 2026-11-25
+
+PR114 CI reached the 240s outer deadline while executing existing lesson84. The final95 suite passes locally at concurrency2 (1279 tests); concurrency3 experiments exposed existing short-deadline failures and were rejected. Keep concurrency2 and every request/test deadline, CPU/RAM/PID/network/filesystem limit. Increase only the trusted outer whole-check default to360s, retain explicit timeout overrides and owned-container cleanup. Deliver this prerequisite in its own independently reviewed/tested PR before resuming PR114; no lesson source or dependency changes.
