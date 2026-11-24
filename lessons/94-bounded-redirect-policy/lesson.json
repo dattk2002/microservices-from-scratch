@@ -1,0 +1,5 @@
+{
+  "id": "94-bounded-redirect-policy",
+  "title": "Theo redirect với allowlist và deadline toàn chuỗi",
+  "entrypoints": ["gateway.mts", "redirector.mts", "resource.mts"]
+}
