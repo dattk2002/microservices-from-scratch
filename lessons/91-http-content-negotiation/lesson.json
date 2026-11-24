@@ -1,0 +1,5 @@
+{
+  "id": "91-http-content-negotiation",
+  "title": "Thương lượng nội dung HTTP bằng Accept và độ ưu tiên",
+  "entrypoints": ["provider.mts", "gateway.mts"]
+}
