@@ -1,0 +1,5 @@
+{
+  "id": "95-http2-goaway-drain",
+  "title": "GOAWAY và ngừng nhận stream mới khi dừng HTTP/2",
+  "entrypoints": ["worker.mts", "gateway.mts"]
+}
