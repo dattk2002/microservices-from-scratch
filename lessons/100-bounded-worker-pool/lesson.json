@@ -1,0 +1,5 @@
+{
+  "id": "100-bounded-worker-pool",
+  "title": "Worker threads và hàng đợi CPU có giới hạn",
+  "entrypoints": ["compute.mts", "worker.mts", "gateway.mts"]
+}
