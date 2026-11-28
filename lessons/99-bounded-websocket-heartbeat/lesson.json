@@ -1,0 +1,4 @@
+{
+  "id": "99-bounded-websocket-heartbeat",
+  "entrypoints": ["server.mts", "client.mts"]
+}
