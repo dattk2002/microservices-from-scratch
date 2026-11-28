@@ -61,19 +61,37 @@ class CourseTests(unittest.TestCase):
             (self.root / 'curriculum.json').write_text(json.dumps(entries))
             with self.assertRaises(ValueError): next_lesson(self.root)
 
-    def test_ninety_five_lesson_curriculum_is_finite_and_validates_its_tail(self):
-        entries = [dict(self.lesson, id=f'{number:02d}-lesson') for number in range(1, 96)]
+    def test_one_hundred_lesson_curriculum_is_finite_and_validates_its_tail(self):
+        entries = [dict(self.lesson, id=f'{number:02d}-lesson') for number in range(1, 101)]
         (self.root / 'curriculum.json').write_text(json.dumps(entries))
         try:
             selected = next_lesson(self.root)
         except ValueError as error:
-            self.fail(f'Authorized finite 95-lesson curriculum was rejected: {error}')
+            self.fail(f'Authorized finite 100-lesson curriculum was rejected: {error}')
         self.assertEqual(selected, entries[0])
         invalid_tail = [*entries[:-1], dict(entries[-1], requirements=[])]
         (self.root / 'curriculum.json').write_text(json.dumps(invalid_tail))
         with self.assertRaises(ValueError): next_lesson(self.root)
-        (self.root / 'curriculum.json').write_text(json.dumps([*entries, dict(self.lesson, id='96-lesson')]))
+        (self.root / 'curriculum.json').write_text(json.dumps([*entries, dict(self.lesson, id='101-lesson')]))
         with self.assertRaisesRegex(ValueError, 'Invalid finite curriculum'): next_lesson(self.root)
+
+    def test_lesson_100_manifest_and_exhaustion_are_supported(self):
+        self.lesson = dict(self.lesson, id='100-worker-pool')
+        (self.root / 'curriculum.json').write_text(json.dumps([self.lesson]))
+        try:
+            self.assertEqual(next_lesson(self.root), self.lesson)
+            self.complete_lesson()
+            validate_lesson_changes(self.root, self.lesson['id'], self.paths())
+            self.assertIsNone(next_lesson(self.root))
+        except ValueError as error:
+            self.fail(f'Authorized lesson 100 was rejected: {error}')
+
+    def test_lesson_identifier_does_not_expand_beyond_100(self):
+        for identifier in ['101-worker', '999-worker', '0100-worker', '../100-worker', '100-worker/../other']:
+            with self.subTest(identifier=identifier):
+                (self.root / 'curriculum.json').write_text(json.dumps([dict(self.lesson, id=identifier)]))
+                with self.assertRaises(ValueError): next_lesson(self.root)
+                with self.assertRaisesRegex(ValueError, '^Invalid lesson id$'): daily.lesson_files(self.root, identifier)
 
     def test_partial_later_lesson_blocks_even_when_first_is_missing(self):
         later = dict(self.lesson, id='02-later')

@@ -21,7 +21,7 @@ TypeScript được **kiểm tra kiểu bằng tsc**, rồi Node chạy `.mts` b
 ## Bài học
 
 - [01 — Ranh giới dịch vụ và HTTP](lessons/01-service-boundaries-http/README.md)
-- [Lộ trình hữu hạn95 bài](curriculum.json): hợp đồng API, dữ liệu riêng,
+- [Lộ trình hữu hạn100 bài](curriculum.json): hợp đồng API, dữ liệu riêng,
   deadline, idempotency, retry, circuit breaker, correlation log, gateway,
   graceful shutdown, outbox, saga, bulkhead, rate limiting, CQRS, cache-aside,
   job bất đồng bộ, xác thực dịch vụ, metrics, chuyển đổi Strangler Fig, discovery,
@@ -68,3 +68,5 @@ Ngày 2026-11-20, chủ repo yêu cầu thêm đúng năm bài 86–90: TCP fram
 Ngày 2026-11-24, chủ repo xác nhận thêm đúng năm bài 91–95: thương lượng nội dung bằng Accept, Expect: 100-continue, HTTP qua Unix socket, redirect có allowlist và deadline toàn chuỗi, và HTTP/2 GOAWAY. Lộ trình hữu hạn 95 bài, không tự gia hạn. Giữ nguyên ngân sách Docker 240 giây và các giới hạn request/test, CPU/RAM/PID/cô lập.
 
 Ngày 2026-11-25, kiểm tra CI của bài 91 chạm ngân sách toàn bộ 240 giây khi còn chạy bài cũ. Ngân sách tsc + test Docker tăng lên 360 giây để kiểm tra đủ lộ trình 95 bài; mức song song vẫn là 2, deadline từng request/test và giới hạn CPU/RAM/PID/cô lập giữ nguyên.
+
+Ngày 2026-11-28, chủ repo xác nhận thêm đúng năm bài 96–100: danh tính dịch vụ bằng mTLS, kiểm soát luồng HTTP/2, DNS cache theo TTL, WebSocket có giới hạn và heartbeat, và worker threads với hàng đợi CPU có giới hạn. Lộ trình hữu hạn 100 bài, không tự gia hạn. Controller hỗ trợ riêng mã bài 100 bên cạnh mã hai chữ số; không nhận mã ba chữ số khác. Bài 96 được kiểm tra, review và push trước khi triển khai bài 97. Giữ nguyên ngân sách toàn bộ tsc + test Docker 360 giây cùng deadline request/test và giới hạn CPU/RAM/PID/cô lập.
