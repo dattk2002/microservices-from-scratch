@@ -137,7 +137,7 @@ def write_state(path, state):
         os.close(descriptor)
 
 def lesson_files(root, identifier):
-    if not re.fullmatch(r'[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*', identifier):
+    if not re.fullmatch(r'(?:[0-9]{2}|100)-[a-z0-9]+(?:-[a-z0-9]+)*', identifier):
         raise ValueError('Invalid lesson id')
     directory = root / 'lessons' / identifier
     if (root / 'lessons').is_symlink() or directory.is_symlink() or not directory.is_dir():
@@ -178,7 +178,7 @@ def lesson_files(root, identifier):
 
 def next_lesson(root):
     lessons = json.loads((root / 'curriculum.json').read_text())
-    if not isinstance(lessons, list) or not 1 <= len(lessons) <= 95:
+    if not isinstance(lessons, list) or not 1 <= len(lessons) <= 100:
         raise ValueError('Invalid finite curriculum')
     seen = set()
     for lesson in lessons:
@@ -186,7 +186,7 @@ def next_lesson(root):
             raise ValueError('Invalid curriculum lesson')
         identifier = lesson.get('id', '')
         if (not isinstance(identifier, str)
-                or not re.fullmatch(r'[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*', identifier)
+                or not re.fullmatch(r'(?:[0-9]{2}|100)-[a-z0-9]+(?:-[a-z0-9]+)*', identifier)
                 or identifier in seen or not isinstance(lesson.get('title'), str)
                 or not isinstance(lesson.get('requirements'), list) or not lesson['requirements']
                 or not all(isinstance(v, str) and 0 < len(v) <= 2000 for v in lesson['requirements'])):

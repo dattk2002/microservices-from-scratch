@@ -1,0 +1,5 @@
+{
+  "id": "96-mutual-tls-identity",
+  "title": "Xác thực hai chiều TLS và danh tính dịch vụ",
+  "entrypoints": ["pki.mts", "provider.mts", "gateway.mts"]
+}

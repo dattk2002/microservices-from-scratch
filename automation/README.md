@@ -2,7 +2,7 @@
 
 Chủ repo đã cho phép lịch09:15 Asia/Ho_Chi_Minh làm một bài tiếp theo trong
 `curriculum.json`, có PR và squash merge sau test/review/CI đạt. Lộ trình hữu
-hạn95 bài (bổ sung bài13–15 ngày2026-11-02 và bài16–20 theo yêu cầu chạy thêm
+hạn100 bài (bổ sung bài13–15 ngày2026-11-02 và bài16–20 theo yêu cầu chạy thêm
 năm bài ngày2026-11-03 và bài21–25 theo yêu cầu đã chốt ngày2026-11-04
 của chủ repo; bài26–30 theo yêu cầu chạy năm bài ngày2026-11-05 và bài31–35 theo yêu cầu chạy năm bài ngày2026-11-06 và bài36–40 theo yêu cầu chạy tiếp năm bài ngày2026-11-08 và bài41–45 theo yêu cầu chạy năm bài ngày2026-11-09 và bài46–50 theo yêu cầu chạy năm bài ngày2026-11-10 và bài51–55 theo yêu cầu chạy tiếp năm bài ngày2026-11-11 và bài56–60 theo yêu cầu chạy năm bài ngày2026-11-12 và bài61–65 theo yêu cầu chạy năm bài ngày2026-11-13 và bài66–70 theo yêu cầu thêm năm bài mới ngày2026-11-16; bài71–75 ngày2026-11-17 và bài76–80 theo yêu cầu chạy tiếp năm bài ngày2026-11-18);
 không tự gia hạn,
@@ -96,3 +96,5 @@ Ngày 2026-11-19, chủ repo yêu cầu thêm đúng năm bài 81–85 (SSE repl
 Ngày 2026-11-20, chủ repo yêu cầu thêm đúng năm bài 86–90: TCP framing, HTTP/2 multiplexing, revision long polling, JSON Merge Patch và Content-Digest trong HTTP trailers. Lộ trình hữu hạn 90 bài, không tự gia hạn. Ngân sách Docker 240 giây và các giới hạn request/test, CPU/RAM/PID/cô lập giữ nguyên.
 
 Ngày 2026-11-24, chủ repo xác nhận thêm đúng năm bài 91–95: thương lượng nội dung bằng Accept, Expect: 100-continue, HTTP qua Unix socket, redirect có allowlist và deadline toàn chuỗi, và HTTP/2 GOAWAY. Lộ trình hữu hạn 95 bài, không tự gia hạn. Giữ nguyên ngân sách Docker 240 giây và các giới hạn request/test, CPU/RAM/PID/cô lập.
+
+Ngày 2026-11-28, chủ repo xác nhận thêm đúng năm bài 96–100: danh tính dịch vụ bằng mTLS, kiểm soát luồng HTTP/2, DNS cache theo TTL, WebSocket có giới hạn và heartbeat, và worker threads với hàng đợi CPU có giới hạn. Lộ trình hữu hạn 100 bài, không tự gia hạn. Controller hỗ trợ riêng mã bài 100 bên cạnh mã hai chữ số; không nhận mã ba chữ số khác. Bài 96 được kiểm tra, review và push trước khi triển khai bài 97. Giữ nguyên ngân sách toàn bộ tsc + test Docker 360 giây cùng deadline request/test và giới hạn CPU/RAM/PID/cô lập.
